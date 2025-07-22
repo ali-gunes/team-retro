@@ -13,9 +13,10 @@ interface RetroCardProps {
     send: (message: any) => void
   }
   isLocked: boolean
+  userId: string
 }
 
-export function RetroCard({ card, room, socket, isLocked }: RetroCardProps) {
+export function RetroCard({ card, room, socket, isLocked, userId }: RetroCardProps) {
   const [showReactions, setShowReactions] = useState(false)
   const [isVoted, setIsVoted] = useState(false)
 
@@ -44,7 +45,10 @@ export function RetroCard({ card, room, socket, isLocked }: RetroCardProps) {
   const handleReaction = (emoji: string) => {
     if (isLocked || !room.settings.allowReactions) return
 
-    const hasReaction = card.reactions.some(r => r.emoji === emoji)
+    // Close the reaction picker
+    setShowReactions(false)
+
+    const hasReaction = card.reactions.some(r => r.emoji === emoji && r.userId === userId)
     
     if (hasReaction) {
       socket.send({

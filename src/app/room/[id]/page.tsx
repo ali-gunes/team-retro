@@ -14,6 +14,7 @@ export default function RoomPage() {
 
   // Generate a stable user ID for this session
   const [userId] = useState(() => {
+    if (typeof window === 'undefined') return 'user-temp'
     const stored = localStorage.getItem('retro-user-id')
     if (stored) return stored
     const newId = `user-${Math.random().toString(36).substr(2, 9)}`
@@ -26,7 +27,7 @@ export default function RoomPage() {
     host: process.env.NEXT_PUBLIC_PARTYKIT_HOST || 'localhost:1999',
     room: roomId,
     userId,
-    userName: 'Anonymous', // You can make this configurable
+    userName: 'Anonymous', // Always use Anonymous
     isFacilitator: false, // You can make this configurable
     onMessage: (event: MessageEvent) => {
       const message = JSON.parse(event.data) as PartyMessage
@@ -39,6 +40,10 @@ export default function RoomPage() {
     },
     onClose: () => {
       console.log('Disconnected from room:', roomId)
+      setIsConnected(false)
+    },
+    onError: (error: Event) => {
+      console.error('WebSocket error in room page:', error)
       setIsConnected(false)
     },
   }), [roomId, userId])
@@ -175,10 +180,23 @@ export default function RoomPage() {
         }
       case 'user_joined':
         const newUser = message.payload as any
-        return {
-          ...currentRoom,
-          users: [...currentRoom.users, newUser],
-          updatedAt: new Date()
+        // Check if user already exists to prevent duplicates
+        const userExists = currentRoom.users.some(u => u.id === newUser.id);
+        if (!userExists) {
+          return {
+            ...currentRoom,
+            users: [...currentRoom.users, newUser],
+            updatedAt: new Date()
+          };
+        } else {
+          // User already exists, just update their info
+          return {
+            ...currentRoom,
+            users: currentRoom.users.map(u => 
+              u.id === newUser.id ? { ...u, ...newUser } : u
+            ),
+            updatedAt: new Date()
+          };
         }
       case 'user_left':
         const leftUser = message.payload as any
@@ -211,6 +229,7 @@ export default function RoomPage() {
         room={room} 
         socket={socket}
         isConnected={isConnected}
+        userId={userId}
       />
     </div>
   )

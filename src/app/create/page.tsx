@@ -10,12 +10,11 @@ import Link from 'next/link'
 export default function CreatePage() {
   const router = useRouter()
   const [roomName, setRoomName] = useState('')
-  const [userName, setUserName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!roomName.trim() || !userName.trim()) return
+    if (!roomName.trim()) return
 
     setIsCreating(true)
 
@@ -71,24 +70,9 @@ export default function CreatePage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="userName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Your Name
-              </label>
-              <input
-                type="text"
-                id="userName"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                placeholder="Enter your name..."
-                className="retro-input"
-                required
-              />
-            </div>
-
             <Button
               type="submit"
-              disabled={isCreating || !roomName.trim() || !userName.trim()}
+              disabled={isCreating || !roomName.trim()}
               className="w-full retro-button-primary"
             >
               {isCreating ? 'Creating...' : 'Create Room'}

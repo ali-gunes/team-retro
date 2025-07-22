@@ -10,12 +10,11 @@ import Link from 'next/link'
 export default function JoinPage() {
   const router = useRouter()
   const [roomId, setRoomId] = useState('')
-  const [userName, setUserName] = useState('')
   const [isJoining, setIsJoining] = useState(false)
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!roomId.trim() || !userName.trim()) return
+    if (!roomId.trim()) return
 
     setIsJoining(true)
 
@@ -68,24 +67,9 @@ export default function JoinPage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="userName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Your Name
-              </label>
-              <input
-                type="text"
-                id="userName"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                placeholder="Enter your name..."
-                className="retro-input"
-                required
-              />
-            </div>
-
             <Button
               type="submit"
-              disabled={isJoining || !roomId.trim() || !userName.trim()}
+              disabled={isJoining || !roomId.trim()}
               className="w-full retro-button-primary"
             >
               {isJoining ? 'Joining...' : 'Join Room'}

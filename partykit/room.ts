@@ -18,6 +18,7 @@ import type {
 export default class RetroRoomServer implements Party.Server {
   private room: IRetroRoom | null = null;
   private users = new Map<string, User>();
+  private disconnectingUsers = new Map<string, NodeJS.Timeout>();
 
   constructor(readonly party: Party.Party) {}
 
@@ -25,17 +26,24 @@ export default class RetroRoomServer implements Party.Server {
     // Get user info from URL parameters or headers
     const url = new URL(ctx.request.url)
     const userId = url.searchParams.get('userId') || ctx.request.headers.get('x-user-id') || uuidv4();
-    const userName = url.searchParams.get('userName') || ctx.request.headers.get('x-user-name') || 'Anonymous';
+    const userName = 'Anonymous'; // Always use Anonymous
     const isFacilitator = (url.searchParams.get('isFacilitator') === 'true') || (ctx.request.headers.get('x-is-facilitator') === 'true');
 
-    // Check if user already exists in the room
-    const existingUser = this.room?.users.find(u => u.id === userId);
-    
+    console.log(`User attempting to connect: ${userName} (${userId})`)
+
+    // Clear any pending disconnect timeout for this user
+    const pendingDisconnect = this.disconnectingUsers.get(userId);
+    if (pendingDisconnect) {
+      clearTimeout(pendingDisconnect);
+      this.disconnectingUsers.delete(userId);
+      console.log(`User ${userName} reconnected before being removed`);
+    }
+
     const user: User = {
       id: userId,
       name: userName,
       isFacilitator,
-      joinedAt: existingUser?.joinedAt || new Date(),
+      joinedAt: new Date(),
       lastSeen: new Date()
     };
 
@@ -45,18 +53,32 @@ export default class RetroRoomServer implements Party.Server {
     // Load room data from Redis if it exists
     await this.loadRoomData();
 
+    // Check if user already exists in the room
+    const existingUser = this.room?.users.find(u => u.id === userId);
+
     // If room doesn't exist, create it
     if (!this.room) {
       this.room = this.createNewRoom(userId);
       console.log(`Created new room: ${this.party.id} with facilitator: ${userName}`);
+      console.log('New room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
     } else if (!existingUser) {
       // Add user to existing room only if they don't already exist
       this.room.users.push(user);
       console.log(`User ${userName} joined room: ${this.party.id}. Total users: ${this.room.users.length}`);
+      console.log('Updated room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
+      
+      // Broadcast user joined to all other users
+      this.broadcastToOthers(ws, {
+        type: 'user_joined',
+        payload: user,
+        timestamp: new Date(),
+        userId
+      });
     } else {
       // Update existing user's last seen
       existingUser.lastSeen = new Date();
       console.log(`User ${userName} reconnected to room: ${this.party.id}`);
+      console.log('Reconnected room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
     }
 
     // Save room data after any changes
@@ -138,21 +160,29 @@ export default class RetroRoomServer implements Party.Server {
       console.log(`User ${userName} (${userId}) disconnected from room ${this.party.id}`);
       this.users.delete(userId);
       
-      if (this.room) {
-        const userIndex = this.room.users.findIndex(u => u.id === userId);
-        if (userIndex !== -1) {
-          this.room.users.splice(userIndex, 1);
-          console.log(`Removed user ${userName} from room ${this.party.id}. Users remaining: ${this.room.users.length}`);
-          await this.saveRoomData();
+      // Set a grace period before removing the user from the room
+      // This prevents race conditions when users refresh the page
+      const disconnectTimeout = setTimeout(async () => {
+        if (this.room) {
+          const userIndex = this.room.users.findIndex(u => u.id === userId);
+          if (userIndex !== -1) {
+            this.room.users.splice(userIndex, 1);
+            console.log(`Removed user ${userName} from room ${this.party.id} after grace period. Users remaining: ${this.room.users.length}`);
+            await this.saveRoomData();
+            
+            this.broadcastToOthers(ws, {
+              type: 'user_left',
+              payload: { userId, userName },
+              timestamp: new Date(),
+              userId
+            });
+          }
         }
-      }
-
-      this.broadcastToOthers(ws, {
-        type: 'user_left',
-        payload: { userId, userName },
-        timestamp: new Date(),
-        userId
-      });
+        this.disconnectingUsers.delete(userId);
+      }, 5000); // 5 second grace period
+      
+      this.disconnectingUsers.set(userId, disconnectTimeout);
+      console.log(`User ${userName} marked for removal in 5 seconds`);
     }
   }
 
@@ -198,6 +228,8 @@ export default class RetroRoomServer implements Party.Server {
     const updatedCard: Card = {
       ...card,
       ...request,
+      // Preserve reactions when updating card
+      reactions: card.reactions,
       updatedAt: new Date()
     };
 
@@ -312,9 +344,10 @@ export default class RetroRoomServer implements Party.Server {
     this.room.updatedAt = new Date();
     await this.saveRoomData();
 
+    // Broadcast the updated card instead of just the reaction
     this.broadcast({
-      type: 'reaction_added',
-      payload: reaction,
+      type: 'card_updated',
+      payload: card,
       timestamp: new Date(),
       userId
     });
@@ -334,9 +367,10 @@ export default class RetroRoomServer implements Party.Server {
     this.room.updatedAt = new Date();
     await this.saveRoomData();
 
+    // Broadcast the updated card instead of just the removed reaction
     this.broadcast({
-      type: 'reaction_removed',
-      payload: removedReaction,
+      type: 'card_updated',
+      payload: card,
       timestamp: new Date(),
       userId
     });
@@ -388,6 +422,36 @@ export default class RetroRoomServer implements Party.Server {
     // Get the facilitator user from the users map
     const facilitator = this.users.get(facilitatorId);
     
+    if (!facilitator) {
+      console.error('Facilitator not found in users map:', facilitatorId);
+      // Create a default facilitator user if not found
+      const defaultFacilitator: User = {
+        id: facilitatorId,
+        name: 'Anonymous',
+        isFacilitator: true,
+        joinedAt: new Date(),
+        lastSeen: new Date()
+      };
+      return {
+        id: this.party.id,
+        name: `Retro Room ${this.party.id}`,
+        phase: 'ideation',
+        facilitatorId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        cards: [],
+        votes: [],
+        users: [defaultFacilitator],
+        settings: {
+          allowAnonymousCards: true,
+          allowVoting: true,
+          allowReactions: true,
+          lockedColumns: [],
+          phaseDuration: 10
+        }
+      };
+    }
+    
     return {
       id: this.party.id,
       name: `Retro Room ${this.party.id}`,
@@ -397,7 +461,7 @@ export default class RetroRoomServer implements Party.Server {
       updatedAt: new Date(),
       cards: [],
       votes: [],
-      users: facilitator ? [facilitator] : [],
+      users: [facilitator],
       settings: {
         allowAnonymousCards: true,
         allowVoting: true,

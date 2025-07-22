@@ -14,9 +14,10 @@ interface RetroBoardProps {
     readyState: number
   }
   isConnected: boolean
+  userId: string
 }
 
-export function RetroBoard({ room, socket, isConnected }: RetroBoardProps) {
+export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProps) {
   const [selectedColumn, setSelectedColumn] = useState<RetroColumnType | null>(null)
 
   const columns: RetroColumnType[] = ['start', 'stop', 'action', 'poll']
@@ -70,6 +71,7 @@ export function RetroBoard({ room, socket, isConnected }: RetroBoardProps) {
                 cards={getCardsForColumn(column)}
                 room={room}
                 socket={socket}
+                userId={userId}
                 isSelected={selectedColumn === column}
                 onSelect={() => setSelectedColumn(column)}
                 onDeselect={() => setSelectedColumn(null)}

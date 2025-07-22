@@ -12,6 +12,7 @@ interface RetroColumnProps {
   socket: {
     send: (message: any) => void
   }
+  userId: string
   isSelected: boolean
   onSelect: () => void
   onDeselect: () => void
@@ -49,6 +50,7 @@ export function RetroColumn({
   cards,
   room,
   socket,
+  userId,
   isSelected,
   onSelect,
   onDeselect
@@ -110,6 +112,7 @@ export function RetroColumn({
                         room={room}
                         socket={socket}
                         isLocked={isLocked}
+                        userId={userId}
                       />
                     </div>
                   )}

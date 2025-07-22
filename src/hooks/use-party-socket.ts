@@ -19,6 +19,7 @@ export function usePartySocket(options: PartySocketOptions) {
   const maxReconnectAttempts = 5
   const optionsRef = useRef(options)
   const isConnectingRef = useRef(false)
+  const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Update options ref when options change
   useEffect(() => {
@@ -34,22 +35,39 @@ export function usePartySocket(options: PartySocketOptions) {
 
     try {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      
+      // Clean the host string to remove any trailing characters
+      const cleanHost = optionsRef.current.host.replace(/[%#]$/, '')
+      
       // Build URL with user parameters
-      const url = new URL(`${protocol}//${optionsRef.current.host}/parties/room/${optionsRef.current.room}`)
+      const url = new URL(`${protocol}//${cleanHost}/parties/room/${optionsRef.current.room}`)
+      
       if (optionsRef.current.userId) {
         url.searchParams.set('userId', optionsRef.current.userId)
       }
-      if (optionsRef.current.userName) {
-        url.searchParams.set('userName', optionsRef.current.userName)
-      }
+      // Don't send userName parameter - always use Anonymous
       if (optionsRef.current.isFacilitator) {
         url.searchParams.set('isFacilitator', 'true')
       }
       
+      console.log('Attempting to connect to:', url.toString())
+      
       const ws = new WebSocket(url.toString())
+      
+      // Add connection timeout
+      connectionTimeoutRef.current = setTimeout(() => {
+        if (ws.readyState === WebSocket.CONNECTING) {
+          console.error('WebSocket connection timeout')
+          ws.close()
+        }
+      }, 15000) // 15 second timeout for Safari
       
       ws.onopen = () => {
         console.log('Connected to PartyKit room')
+        if (connectionTimeoutRef.current) {
+          clearTimeout(connectionTimeoutRef.current)
+          connectionTimeoutRef.current = null
+        }
         reconnectAttemptsRef.current = 0
         isConnectingRef.current = false
         optionsRef.current.onOpen?.()
@@ -61,16 +79,23 @@ export function usePartySocket(options: PartySocketOptions) {
 
       ws.onclose = (event) => {
         console.log('Disconnected from PartyKit room', event.code, event.reason)
+        if (connectionTimeoutRef.current) {
+          clearTimeout(connectionTimeoutRef.current)
+          connectionTimeoutRef.current = null
+        }
         isConnectingRef.current = false
         optionsRef.current.onClose?.()
         
-        // Attempt to reconnect
-        if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+        // Only attempt to reconnect if it wasn't a normal closure and we haven't exceeded max attempts
+        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
           const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 10000)
+          console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`)
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttemptsRef.current++
             connect()
           }, delay)
+        } else if (event.code !== 1000) {
+          console.log('Max reconnection attempts reached or connection was closed normally')
         }
       }
 
@@ -78,12 +103,24 @@ export function usePartySocket(options: PartySocketOptions) {
         console.error('WebSocket error:', error)
         isConnectingRef.current = false
         optionsRef.current.onError?.(error)
+        
+        // Don't attempt to reconnect on connection errors immediately
+        // Let the onclose handler manage reconnection
       }
 
       socketRef.current = ws
     } catch (error) {
       console.error('Failed to connect to PartyKit room:', error)
       isConnectingRef.current = false
+      
+      // Attempt to reconnect on connection errors
+      if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 10000)
+        reconnectTimeoutRef.current = setTimeout(() => {
+          reconnectAttemptsRef.current++
+          connect()
+        }, delay)
+      }
     }
   }, [])
 
@@ -93,10 +130,17 @@ export function usePartySocket(options: PartySocketOptions) {
       reconnectTimeoutRef.current = null
     }
     
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current)
+      connectionTimeoutRef.current = null
+    }
+    
     if (socketRef.current) {
       socketRef.current.close()
       socketRef.current = null
     }
+    
+    isConnectingRef.current = false
   }, [])
 
   const send = useCallback((message: any) => {

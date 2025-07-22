@@ -1,0 +1,8 @@
+{
+  "name": "team-retro-partykit",
+  "main": "partykit/room.ts",
+  "parties": {
+    "room": "partykit/room.ts"
+  },
+  "compatibilityDate": "2025-07-22"
+} 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { RetroBoard } from '@/components/retro-board'
 import { usePartySocket } from '@/hooks/use-party-socket'
@@ -11,6 +11,7 @@ export default function RoomPage() {
   const roomId = params.id as string
   const [room, setRoom] = useState<RetroRoom | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+  const processedMessages = useRef(new Set<string>())
 
   // Generate a stable user ID for this session
   const [userId] = useState(() => {
@@ -52,6 +53,24 @@ export default function RoomPage() {
 
   const handleMessage = (message: PartyMessage) => {
     console.log('Handling message:', message.type, message.payload)
+    
+    // Create a unique message ID to prevent duplicates
+    const messageId = `${message.type}-${message.userId}-${message.timestamp}-${JSON.stringify(message.payload)}`
+    
+    // Check if we've already processed this message
+    if (processedMessages.current.has(messageId)) {
+      console.log('Skipping duplicate message:', messageId)
+      return
+    }
+    
+    // Add to processed messages
+    processedMessages.current.add(messageId)
+    
+    // Clean up old messages (keep last 100)
+    if (processedMessages.current.size > 100) {
+      const messagesArray = Array.from(processedMessages.current)
+      processedMessages.current = new Set(messagesArray.slice(-50))
+    }
     
     // Ignore user_joined messages for the current user to prevent loops
     if (message.type === 'user_joined' && message.userId === userId) {

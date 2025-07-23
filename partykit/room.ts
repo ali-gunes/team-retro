@@ -214,7 +214,7 @@ export default class RetroRoomServer implements Party.Server {
       userId
     };
     
-    console.log(`Broadcasting card_added: ${card.id} to ${this.party.connections.size} connections`);
+    console.log(`Broadcasting card_added: ${card.id} to all connections`);
     this.broadcast(broadcastMessage);
   }
 

@@ -38,18 +38,24 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Room Info */}
+          {/* Left Side - Room Info */}
           <div className="flex items-center space-x-4">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Retro Room: {room.name}
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Room ID: {room.id}
-              </p>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              <span>Room ID: {room.id}</span>
             </div>
             
-            {/* Connection Status */}
+            {/* Share Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="retro-button-secondary"
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+            
+            {/* Connection Status - Shows if WebSocket is connected to the server */}
             <div className="flex items-center space-x-2">
               {isConnected ? (
                 <Wifi className="h-4 w-4 text-green-500" />
@@ -62,19 +68,15 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Share Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="retro-button-secondary"
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
-            </Button>
+          {/* Center - Room Name */}
+          <div className="text-center">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Retro Room: {room.name}
+            </h1>
+          </div>
 
+          {/* Right Side - Actions */}
+          <div className="flex items-center space-x-2">
             {/* Export Button */}
             <Button
               variant="outline"
@@ -98,6 +100,11 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
                 Settings
               </Button>
             )}
+
+            {/* Participant Count */}
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {room.users.length} participant{room.users.length !== 1 ? 's' : ''}
+            </div>
 
             {/* Theme Toggle */}
             <ThemeToggle />
@@ -132,13 +139,6 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
           </div>
         </div>
         */}
-
-        {/* Participant Count */}
-        <div className="mt-4 flex items-center justify-end">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {room.users.length} participant{room.users.length !== 1 ? 's' : ''}
-          </div>
-        </div>
 
         {/* Settings Panel */}
         {showSettings && isFacilitator && (

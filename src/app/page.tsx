@@ -5,14 +5,22 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { Plus, Users, Zap, Star } from 'lucide-react'
 import Link from 'next/link'
 import { UpdatesSection } from '@/components/updates-section'
+import Image from 'next/image'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex flex-col">
+      <div className="container mx-auto px-4 py-8 flex-1">
         {/* Header */}
         <header className="flex justify-between items-center mb-16">
           <div className="flex items-center space-x-4">
+            <Image
+              src="/logo_teamretro.svg"
+              alt="Team Retro Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10"
+            />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Team Retro
             </h1>
@@ -85,6 +93,15 @@ export default function HomePage() {
         {/* Updates Section */}
         <UpdatesSection />
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            C&I ekibi için ❤️ ve ☕️ ile yapılmıştır.
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 

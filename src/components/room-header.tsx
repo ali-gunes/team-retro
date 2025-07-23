@@ -5,6 +5,7 @@ import { Share2, Download, Settings, Wifi, WifiOff } from 'lucide-react'
 import { Button } from './ui/button'
 import { ThemeToggle } from './theme-toggle'
 import type { RetroRoom } from '@/types'
+import Image from 'next/image'
 
 interface RoomHeaderProps {
   room: RetroRoom
@@ -52,8 +53,8 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
         <div className="flex items-center justify-between">
           {/* Left Side - Room Info */}
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              <span>Room ID: {room.id}</span>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+              Room ID: {room.id}
             </div>
             
             {/* Share Button */}
@@ -90,40 +91,42 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
           </div>
 
           {/* Right Side - Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Export Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-              className="retro-button-secondary"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-
-            {/* Settings Button (Facilitator Only) */}
-            {/* TODO: Settings functionality will be implemented later
-            {isFacilitator && (
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              {/* Export Button */}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowSettings(!showSettings)}
+                onClick={handleExport}
                 className="retro-button-secondary"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+                <Download className="h-4 w-4 mr-2" />
+                Export
               </Button>
-            )}
-            */}
 
-            {/* Participant Count */}
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {room.users.length} participant{room.users.length !== 1 ? 's' : ''}
+              {/* Settings Button (Facilitator Only) */}
+              {/* TODO: Settings functionality will be implemented later
+              {isFacilitator && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="retro-button-secondary"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              )}
+              */}
+
+              {/* Participant Count */}
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {room.users.length} participant{room.users.length !== 1 ? 's' : ''}
+              </div>
+
+              {/* Theme Toggle */}
+              <ThemeToggle />
             </div>
-
-            {/* Theme Toggle */}
-            <ThemeToggle />
           </div>
         </div>
 

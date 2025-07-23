@@ -108,8 +108,8 @@ export default function CreatePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex flex-col">
+      <div className="container mx-auto px-4 py-8 flex-1">
         {/* Header */}
         <header className="flex justify-between items-center mb-16">
           <Link href="/" className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
@@ -120,10 +120,10 @@ export default function CreatePage() {
         </header>
 
         {/* Create Form */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Create New Retrospective
+              Create New Room
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
               Set up a new retrospective session for your team
@@ -146,8 +146,8 @@ export default function CreatePage() {
               />
             </div>
 
-            {/* Quick Polls Toggle */}
-            <div>
+            {/* Poll Toggle */}
+            <div className="space-y-2">
               <label className="flex items-center space-x-3 cursor-pointer">
                 <div className="relative inline-block w-11 h-6 transition-colors duration-200 ease-in-out">
                   <input
@@ -253,6 +253,15 @@ export default function CreatePage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            C&I ekibi için ❤️ ve ☕️ ile yapılmıştır.
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 

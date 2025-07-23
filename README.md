@@ -12,6 +12,22 @@ A real-time retrospective application for Scrum teams built with React, TypeScri
 - **Voting System**: Upvote cards to prioritize discussion
 - **Emoji Reactions**: React to cards with emojis
 - **Drag & Drop**: Move cards between columns
+- **Card Deletion**: Delete cards (author-only with proper authorization)
+
+### Interactive Poll System
+- **Categorized Polls**: Workplace, Sprint, Team, Productivity, and General Mood categories
+- **Multiple Poll Types**: Yes/No, Scale (1-5), Emoji Scale, and Multiple Choice polls
+- **Real-time Voting**: Instant feedback with optimistic UI updates
+- **Poll Selection**: Toggle-based poll selection during room creation
+- **Visual Results**: Real-time poll results visible to all participants
+- **Auto-sync**: Server reconciliation with error handling
+
+### Room Management
+- **Enhanced Room Creation**: Toggle-based poll selection with categorized tabs
+- **Share Room Links**: Copy room links to clipboard with toast notifications
+- **Automatic Join**: Direct room joining via shared links
+- **Room Name Processing**: Auto-trim and capitalize room names
+- **Responsive Layout**: Centered layout when polls are hidden
 
 ### Phase Management
 - **Ideation**: Add cards to columns
@@ -33,6 +49,7 @@ A real-time retrospective application for Scrum teams built with React, TypeScri
 - **Real-time Sync**: WebSocket-based state synchronization
 - **Redis Storage**: Temporary room state persistence
 - **Vercel Deployment**: Ready for production deployment
+- **Updates Section**: Auto-carousel showing latest features and improvements
 
 ## 🛠️ Tech Stack
 
@@ -62,24 +79,27 @@ team-retro/
 │   ├── app/                    # Next.js app router
 │   │   ├── globals.css        # Global styles
 │   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Landing page
-│   │   ├── create/            # Create room page
+│   │   ├── page.tsx           # Landing page with updates section
+│   │   ├── create/            # Create room page with poll selection
 │   │   ├── join/              # Join room page
-│   │   ├── room/[id]/         # Room page
+│   │   ├── room/[id]/         # Room page with dynamic columns
 │   │   └── api/               # API routes
 │   ├── components/            # React components
 │   │   ├── ui/               # Reusable UI components
 │   │   ├── retro-board.tsx   # Main board component
-│   │   ├── retro-column.tsx  # Column component
-│   │   ├── retro-card.tsx    # Card component
+│   │   ├── retro-column.tsx  # Column component with poll support
+│   │   ├── retro-card.tsx    # Card component with delete functionality
+│   │   ├── poll-card.tsx     # Interactive poll component
+│   │   ├── updates-section.tsx # Updates carousel component
 │   │   └── ...
 │   ├── hooks/                # Custom React hooks
 │   ├── lib/                  # Utility functions
 │   └── types/                # TypeScript type definitions
 ├── partykit/                 # PartyKit server
-│   ├── room.ts              # WebSocket room handler
+│   ├── room.ts              # WebSocket room handler with poll support
 │   └── partykit.json        # PartyKit configuration
 ├── public/                   # Static assets
+│   └── polls.json           # Poll definitions with categories
 └── package.json             # Dependencies and scripts
 ```
 
@@ -131,22 +151,32 @@ team-retro/
 
 ### Creating a Room
 1. Visit the homepage
-2. Click "Create New Retro"
+2. Click "Create New Room"
 3. Enter room name and your name
-4. You'll be redirected to the room as facilitator
+4. **Optional**: Enable Quick Polls and select polls from categories
+5. You'll be redirected to the room as facilitator
 
 ### Joining a Room
 1. Visit the homepage
-2. Click "Join Existing Retro"
+2. Click "Join Existing Room"
 3. Enter the room ID and your name
 4. Join the active session
 
 ### Using the Board
-- **Add Cards**: Click "Add Card" in any column
+- **Add Cards**: Click "Add Card" in any column (except Quick Polls)
 - **Vote**: Click the heart icon on cards
 - **React**: Click the message icon to add emojis
 - **Drag & Drop**: Move cards between columns
+- **Delete Cards**: Use the three-dots menu (author-only)
+- **Vote on Polls**: Click poll options to vote (real-time updates)
 - **Phase Control**: Use the phase controls (facilitator only)
+
+### Poll System
+- **Enable Polls**: Toggle "Enable Quick Polls" during room creation
+- **Select Polls**: Choose from Workplace, Sprint, Team, Productivity, and General Mood categories
+- **Vote**: Click on poll options to vote (can change votes dynamically)
+- **View Results**: See real-time results and vote counts
+- **Poll Types**: Yes/No, Scale (1-5), Emoji Scale, and Multiple Choice
 
 ## 🔧 Configuration
 
@@ -174,6 +204,16 @@ Room data is stored in Redis with the following keys:
 - `room:<id>:votes` - Vote data
 - `room:<id>:users` - User data
 - `room:<id>:settings` - Room settings
+- `room:<id>:polls` - Poll data
+- `room:<id>:pollVotes` - Poll vote data
+
+### Poll Configuration
+Polls are defined in `public/polls.json` with categories:
+- **Workplace**: Manager support, work-life balance, tools/resources
+- **Sprint**: Planning process, goals, completion status
+- **Team**: Contributions, communication, psychological safety
+- **Productivity**: Focus, blockers
+- **General Mood**: Sprint feelings, success rating, pride
 
 ## 🚀 Deployment
 
@@ -206,6 +246,20 @@ npm run type-check   # Run TypeScript type checking
 - Prettier for code formatting
 - TailwindCSS for consistent styling
 
+## 📈 Recent Updates
+
+### v1.2.0 - Poll System Launch (2025-07-24)
+- **Interactive Quick Polls**: Real-time voting with categorized poll selection
+- **Multiple Poll Types**: Yes/No, Scale, Emoji Scale, and Multiple Choice
+- **Optimistic Updates**: Instant UI feedback with server reconciliation
+- **Enhanced Room Creation**: Toggle-based poll selection with categorized tabs
+
+### Recent Improvements (2025-07-23)
+- **Card Delete Functionality**: Author-only card deletion with proper authorization
+- **Share Room Links**: Copy room links with toast notifications and automatic join
+- **Responsive Layout**: Centered layout when polls are hidden
+- **Room Name Processing**: Auto-trim and capitalize room names
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -223,4 +277,5 @@ This project is licensed under the MIT License.
 - Built with [Next.js](https://nextjs.org/)
 - Real-time communication with [PartyKit](https://partykit.io/)
 - Styling with [TailwindCSS](https://tailwindcss.com/)
-- Icons from [Lucide](https://lucide.dev/) 
+- Icons from [Lucide](https://lucide.dev/)
+- Turkish footer message: "C&I ekibi için ❤ ve ☕️ ile yapılmıştır." 

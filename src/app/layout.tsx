@@ -7,7 +7,12 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Team Retro - Real-time Retrospectives',
-  description: 'A real-time retrospective app for Scrum teams with live collaboration',
+  description: 'Collaborate with your team in real-time. Share thoughts, vote on ideas, and run interactive polls to make your retrospectives more engaging and productive.',
+  icons: {
+    icon: '/logo_teamretro.png',
+    shortcut: '/logo_teamretro.png',
+    apple: '/logo_teamretro.png',
+  },
 }
 
 export default function RootLayout({

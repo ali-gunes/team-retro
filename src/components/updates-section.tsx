@@ -110,6 +110,14 @@ export function UpdatesSection() {
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = date.toLocaleDateString('en-US', { month: 'long' })
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -147,7 +155,7 @@ export function UpdatesSection() {
                     {update.description}
                   </p>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(update.date).toLocaleDateString()}
+                    {formatDate(update.date)}
                   </span>
                 </div>
               </div>
@@ -175,7 +183,7 @@ export function UpdatesSection() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {new Date(updates[currentUpdateIndex].date).toLocaleDateString()}
+                  {formatDate(updates[currentUpdateIndex].date)}
                 </span>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-500 dark:text-gray-400">

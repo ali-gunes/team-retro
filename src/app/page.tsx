@@ -1,6 +1,10 @@
-import Link from 'next/link'
+"use client"
+
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { Plus, Users, Zap, Star } from 'lucide-react'
+import Link from 'next/link'
+import { UpdatesSection } from '@/components/updates-section'
 
 export default function HomePage() {
   return (
@@ -8,10 +12,7 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex justify-between items-center mb-16">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">R</span>
-            </div>
+          <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Team Retro
             </h1>
@@ -20,67 +21,69 @@ export default function HomePage() {
         </header>
 
         {/* Hero Section */}
-        <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             Real-time Retrospectives
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-            Collaborate with your team in real-time. Create anonymous cards, vote, and discuss 
-            to improve your team's processes together.
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+            Collaborate with your team in real-time. Share thoughts, vote on ideas, and run interactive polls 
+            to make your retrospectives more engaging and productive.
           </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link href="/create" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 px-8 bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500 retro-button-primary">
-              Create New Retro
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/create">
+              <Button className="retro-button-primary text-lg px-8 py-3">
+                <Plus className="h-5 w-5 mr-2" />
+                Create New Room
+              </Button>
             </Link>
-            <Link href="/join" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 px-8 border border-gray-300 bg-white hover:bg-gray-50 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-100 retro-button-secondary">
-              Join Existing Retro
+            <Link href="/join">
+              <Button variant="outline" className="retro-button-secondary text-lg px-8 py-3">
+                <Users className="h-5 w-5 mr-2" />
+                Join Existing Room
+              </Button>
             </Link>
-          </div>
-
-          {/* Features */}
-          <div className="grid md:grid-cols-3 gap-8 mt-16">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-retro-start rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-xl">🚀</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Start
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                What should we start doing?
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-retro-stop rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-xl">🛑</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Stop
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                What should we stop doing?
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-retro-action rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-xl">⚡</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Action
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                What actions should we take?
-              </p>
-            </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-16 text-center text-gray-500 dark:text-gray-400">
-          <p>Built with React, TypeScript, and PartyKit for real-time collaboration</p>
-        </footer>
+        {/* Features Section */}
+        <div className="mb-16 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="text-center">
+            <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Real-time Collaboration
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              See updates instantly as your team adds cards, votes, and reacts in real-time.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="bg-green-100 dark:bg-green-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <Zap className="h-8 w-8 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Interactive Polls
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Run quick polls with voting, scales, and emoji reactions to gather team feedback.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="bg-purple-100 dark:bg-purple-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <Star className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Anonymous Participation
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Encourage honest feedback with anonymous cards and voting options.
+            </p>
+          </div>
+        </div>
+
+        {/* Updates Section */}
+        <UpdatesSection />
       </div>
     </div>
   )

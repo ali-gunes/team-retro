@@ -27,7 +27,6 @@ export default class RetroRoomServer implements Party.Server {
     const url = new URL(ctx.request.url)
     const userId = url.searchParams.get('userId') || ctx.request.headers.get('x-user-id') || uuidv4();
     const userName = 'Anonymous'; // Always use Anonymous
-    const isFacilitator = (url.searchParams.get('isFacilitator') === 'true') || (ctx.request.headers.get('x-is-facilitator') === 'true');
 
     console.log(`User attempting to connect: ${userName} (${userId})`)
 
@@ -39,17 +38,6 @@ export default class RetroRoomServer implements Party.Server {
       console.log(`User ${userName} reconnected before being removed`);
     }
 
-    const user: User = {
-      id: userId,
-      name: userName,
-      isFacilitator,
-      joinedAt: new Date(),
-      lastSeen: new Date()
-    };
-
-    this.users.set(userId, user);
-    ws.setState({ userId, userName, isFacilitator });
-
     // Load room data from Redis if it exists
     await this.loadRoomData();
 
@@ -57,16 +45,28 @@ export default class RetroRoomServer implements Party.Server {
     const existingUser = this.room?.users.find(u => u.id === userId);
 
     // If room doesn't exist, create it
+    let isFacilitator = false;
     if (!this.room) {
+      isFacilitator = true;
       this.room = this.createNewRoom(userId);
       console.log(`Created new room: ${this.party.id} with facilitator: ${userName}`);
       console.log('New room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
     } else if (!existingUser) {
+      // If there are no users in the room, this user becomes the facilitator
+      isFacilitator = (this.room.users.length === 0);
       // Add user to existing room only if they don't already exist
+      const user: User = {
+        id: userId,
+        name: userName,
+        isFacilitator,
+        joinedAt: new Date(),
+        lastSeen: new Date()
+      };
       this.room.users.push(user);
+      this.users.set(userId, user);
+      ws.setState({ userId, userName, isFacilitator });
       console.log(`User ${userName} joined room: ${this.party.id}. Total users: ${this.room.users.length}`);
       console.log('Updated room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
-      
       // Broadcast user joined to all other users
       this.broadcastToOthers(ws, {
         type: 'user_joined',
@@ -77,8 +77,19 @@ export default class RetroRoomServer implements Party.Server {
     } else {
       // Update existing user's last seen
       existingUser.lastSeen = new Date();
+      isFacilitator = existingUser.isFacilitator;
+      this.users.set(userId, existingUser);
+      ws.setState({ userId, userName, isFacilitator });
       console.log(`User ${userName} reconnected to room: ${this.party.id}`);
       console.log('Reconnected room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
+    }
+
+    // If this is the very first user (room just created), set up their state
+    if (!existingUser && this.room && this.room.users.length === 1) {
+      const facilitator = this.room.users[0];
+      facilitator.isFacilitator = true;
+      this.users.set(facilitator.id, facilitator);
+      ws.setState({ userId: facilitator.id, userName: facilitator.name, isFacilitator: true });
     }
 
     // Save room data after any changes
@@ -95,10 +106,10 @@ export default class RetroRoomServer implements Party.Server {
     ws.send(JSON.stringify(roomStateMessage));
 
     // Notify other users about the new user (only if they're actually new)
-    if (!existingUser) {
+    if (!existingUser && this.room && this.room.users.length > 1) {
       this.broadcastToOthers(ws, {
         type: 'user_joined',
-        payload: user,
+        payload: this.room.users[this.room.users.length - 1],
         timestamp: new Date(),
         userId
       });

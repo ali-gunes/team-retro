@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
       cards: [],
       votes: [],
       users: [],
+      polls: [],
+      pollVotes: [],
       settings: {
         allowAnonymousCards: true,
         allowVoting: true,

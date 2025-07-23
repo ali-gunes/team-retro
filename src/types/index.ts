@@ -92,10 +92,10 @@ export interface ExportFormat {
 }
 
 export interface PartyMessage {
-  type: PartyMessageType;
-  payload: any;
-  timestamp: Date;
-  userId: string;
+  type: PartyMessageType
+  payload: any
+  timestamp: Date
+  userId?: string
 }
 
 export interface RedisRoomData {
@@ -149,18 +149,20 @@ export interface ApiResponse<T = any> {
 } 
 
 export type PartyMessageType = 
-  | 'user_joined' 
-  | 'room_state' 
-  | 'card_added' 
-  | 'card_updated' 
-  | 'card_deleted' 
-  | 'vote_added' 
-  | 'vote_removed' 
-  | 'reaction_added' 
-  | 'reaction_removed' 
+  | 'room_state'
+  | 'card_added'
+  | 'card_updated'
+  | 'card_deleted'
+  | 'vote_added'
+  | 'vote_removed'
+  | 'reaction_added'
+  | 'reaction_removed'
+  | 'user_joined'
+  | 'user_left'
+  | 'phase_changed'
+  | 'room_settings_updated'
   | 'poll_vote_added'
   | 'poll_vote_removed'
-  | 'phase_changed' 
-  | 'user_left' 
-  | 'room_settings_updated' 
-  | 'error'; 
+  | 'ping'
+  | 'pong'
+  | 'error' 

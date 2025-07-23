@@ -112,7 +112,7 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
             <BarChart3 className="h-4 w-4 text-purple-500" />
-            <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">POLL</span>
+            <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">ANKET</span>
           </div>
           <h3 className="font-medium text-gray-900 dark:text-white mb-2">
             {poll.question}

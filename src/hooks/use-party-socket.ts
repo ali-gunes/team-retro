@@ -22,11 +22,52 @@ export function usePartySocket(options: PartySocketOptions) {
   const optionsRef = useRef(options)
   const isConnectingRef = useRef(false)
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const heartbeatTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastPongRef = useRef<number>(Date.now())
 
   // Update options ref when options change
   useEffect(() => {
     optionsRef.current = options
   }, [options])
+
+  const startHeartbeat = useCallback(() => {
+    // Clear any existing heartbeat
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current)
+    }
+    if (heartbeatTimeoutRef.current) {
+      clearTimeout(heartbeatTimeoutRef.current)
+    }
+
+    // Start heartbeat every 30 seconds
+    heartbeatIntervalRef.current = setInterval(() => {
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        console.log('Sending heartbeat ping')
+        socketRef.current.send(JSON.stringify({ type: 'ping' }))
+        
+        // Set timeout for pong response (10 seconds)
+        heartbeatTimeoutRef.current = setTimeout(() => {
+          console.warn('Heartbeat timeout - no pong received')
+          // Force reconnect if no pong received
+          if (socketRef.current) {
+            socketRef.current.close(1000, 'Heartbeat timeout')
+          }
+        }, 10000)
+      }
+    }, 30000) // 30 seconds
+  }, [])
+
+  const stopHeartbeat = useCallback(() => {
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current)
+      heartbeatIntervalRef.current = null
+    }
+    if (heartbeatTimeoutRef.current) {
+      clearTimeout(heartbeatTimeoutRef.current)
+      heartbeatTimeoutRef.current = null
+    }
+  }, [])
 
   const connect = useCallback(() => {
     if (socketRef.current?.readyState === WebSocket.OPEN || isConnectingRef.current) {
@@ -77,11 +118,37 @@ export function usePartySocket(options: PartySocketOptions) {
         }
         reconnectAttemptsRef.current = 0
         isConnectingRef.current = false
+        lastPongRef.current = Date.now()
+        
+        // Start heartbeat after successful connection
+        startHeartbeat()
+        
         optionsRef.current.onOpen?.()
       }
 
       ws.onmessage = (event) => {
-        optionsRef.current.onMessage?.(event)
+        try {
+          const message = JSON.parse(event.data)
+          
+          // Handle pong response
+          if (message.type === 'pong') {
+            console.log('Received heartbeat pong')
+            lastPongRef.current = Date.now()
+            
+            // Clear the heartbeat timeout since we got a pong
+            if (heartbeatTimeoutRef.current) {
+              clearTimeout(heartbeatTimeoutRef.current)
+              heartbeatTimeoutRef.current = null
+            }
+            return
+          }
+          
+          // Handle other messages normally
+          optionsRef.current.onMessage?.(event)
+        } catch (error) {
+          // If message is not JSON, pass it through as-is
+          optionsRef.current.onMessage?.(event)
+        }
       }
 
       ws.onclose = (event) => {
@@ -91,6 +158,10 @@ export function usePartySocket(options: PartySocketOptions) {
           connectionTimeoutRef.current = null
         }
         isConnectingRef.current = false
+        
+        // Stop heartbeat on disconnect
+        stopHeartbeat()
+        
         optionsRef.current.onClose?.()
         
         // Only attempt to reconnect if it wasn't a normal closure and we haven't exceeded max attempts
@@ -129,7 +200,7 @@ export function usePartySocket(options: PartySocketOptions) {
         }, delay)
       }
     }
-  }, [])
+  }, [startHeartbeat, stopHeartbeat])
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -142,13 +213,16 @@ export function usePartySocket(options: PartySocketOptions) {
       connectionTimeoutRef.current = null
     }
     
+    // Stop heartbeat
+    stopHeartbeat()
+    
     if (socketRef.current) {
       socketRef.current.close()
       socketRef.current = null
     }
     
     isConnectingRef.current = false
-  }, [])
+  }, [stopHeartbeat])
 
   const send = useCallback((message: any) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {

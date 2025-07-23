@@ -150,9 +150,18 @@ export default class RetroRoomServer implements Party.Server {
     const { userId, userName, isFacilitator } = ws.state as any;
     
     try {
-      const data = JSON.parse(message) as PartyMessage;
-      
+      const data = JSON.parse(message) as PartyMessage
+      console.log('Received message:', data.type, data.payload)
+
       switch (data.type) {
+        case 'ping':
+          // Respond to heartbeat ping with pong
+          ws.send(JSON.stringify({
+            type: 'pong',
+            timestamp: new Date()
+          }))
+          break
+          
         case 'card_added':
           await this.handleCardAdded(data.payload as CreateCardRequest, userId, userName);
           break;
@@ -174,29 +183,30 @@ export default class RetroRoomServer implements Party.Server {
         case 'reaction_removed':
           await this.handleReactionRemoved(data.payload as ReactionRequest, userId, userName);
           break;
+        case 'phase_changed':
+          // TODO: Phase functionality might be implemented in the future
+          // await this.handlePhaseChanged(data.payload as PhaseChangeRequest, userId, userName);
+          break;
+        case 'room_settings_updated':
+          if (isFacilitator) {
+            await this.handleRoomSettingsUpdated(data.payload as RoomSettingsUpdateRequest, userId, userName);
+          }
+          break;
         case 'poll_vote_added':
           await this.handlePollVoteAdded(data.payload as any, userId, userName);
           break;
         case 'poll_vote_removed':
           await this.handlePollVoteRemoved(data.payload as any, userId, userName);
           break;
-        // TODO: Phase functionality might be implemented in the future
-        // case 'phase_changed':
-        //   if (isFacilitator) {
-        //     await this.handlePhaseChanged(data.payload as PhaseChangeRequest, userId, userName);
-        //   }
-        //   break;
-        case 'room_settings_updated':
-          if (isFacilitator) {
-            await this.handleRoomSettingsUpdated(data.payload as RoomSettingsUpdateRequest, userId, userName);
-          }
-          break;
+        default:
+          console.log('Unknown message type:', data.type);
       }
     } catch (error) {
       console.error('Error handling message:', error);
       ws.send(JSON.stringify({
         type: 'error',
-        payload: { message: 'Failed to process message' }
+        payload: { message: 'Failed to process message' },
+        timestamp: new Date()
       }));
     }
   }

@@ -13,6 +13,12 @@ export default function RoomPage() {
   const [isConnected, setIsConnected] = useState(false)
   const processedMessages = useRef(new Set<string>())
 
+  // Get room name from localStorage
+  const [roomName] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return localStorage.getItem(`room-name-${roomId}`) || ''
+  })
+
   // Generate a stable user ID for this session
   const [userId] = useState(() => {
     if (typeof window === 'undefined') return 'user-temp'
@@ -30,6 +36,7 @@ export default function RoomPage() {
     userId,
     userName: 'Anonymous', // Always use Anonymous
     isFacilitator: false, // You can make this configurable
+    roomName, // Pass room name from localStorage to backend
     onMessage: (event: MessageEvent) => {
       const message = JSON.parse(event.data) as PartyMessage
       console.log('Received message:', message.type, message.payload)
@@ -47,7 +54,7 @@ export default function RoomPage() {
       console.error('WebSocket error in room page:', error)
       setIsConnected(false)
     },
-  }), [roomId, userId])
+  }), [roomId, userId, roomName])
 
   const socket = usePartySocket(socketOptions)
 

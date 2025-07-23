@@ -6,6 +6,7 @@ interface PartySocketOptions {
   userId?: string
   userName?: string
   isFacilitator?: boolean
+  roomName?: string
   onMessage?: (event: MessageEvent) => void
   onOpen?: () => void
   onClose?: () => void
@@ -41,13 +42,15 @@ export function usePartySocket(options: PartySocketOptions) {
       
       // Build URL with user parameters
       const url = new URL(`${protocol}//${cleanHost}/parties/room/${optionsRef.current.room}`)
-      
       if (optionsRef.current.userId) {
         url.searchParams.set('userId', optionsRef.current.userId)
       }
       // Don't send userName parameter - always use Anonymous
       if (optionsRef.current.isFacilitator) {
         url.searchParams.set('isFacilitator', 'true')
+      }
+      if (optionsRef.current.roomName) {
+        url.searchParams.set('roomName', optionsRef.current.roomName)
       }
       
       console.log('Attempting to connect to:', url.toString())

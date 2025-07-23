@@ -42,7 +42,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
           <div className="flex items-center space-x-4">
             <div>
               <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {room.name}
+                Retro Room: {room.name}
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Room ID: {room.id}

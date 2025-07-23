@@ -1,11 +1,12 @@
 import type * as Party from "partykit/server";
 import { v4 as uuidv4 } from 'uuid';
-import type { 
-  RetroRoom as IRetroRoom, 
-  Card, 
-  User, 
-  Vote, 
-  Reaction, 
+import { Redis } from '@upstash/redis';
+import type {
+  RetroRoom as IRetroRoom,
+  Card,
+  User,
+  Vote,
+  Reaction,
   PartyMessage,
   CreateCardRequest,
   UpdateCardRequest,
@@ -19,14 +20,24 @@ export default class RetroRoomServer implements Party.Server {
   private room: IRetroRoom | null = null;
   private users = new Map<string, User>();
   private disconnectingUsers = new Map<string, NodeJS.Timeout>();
+  private redis: Redis | null = null;
 
-  constructor(readonly party: Party.Party) {}
+  constructor(readonly party: Party.Party) {
+    // Initialize Redis client if environment variables are available
+    if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+      this.redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      });
+    }
+  }
 
   async onConnect(ws: Party.Connection, ctx: Party.ConnectionContext) {
     // Get user info from URL parameters or headers
     const url = new URL(ctx.request.url)
     const userId = url.searchParams.get('userId') || ctx.request.headers.get('x-user-id') || uuidv4();
     const userName = 'Anonymous'; // Always use Anonymous
+    const roomName = url.searchParams.get('roomName') || '';
 
     console.log(`User attempting to connect: ${userName} (${userId})`)
 
@@ -63,8 +74,8 @@ export default class RetroRoomServer implements Party.Server {
       this.users.set(userId, user);
       ws.setState({ userId, userName, isFacilitator: true });
       
-      // Now create the room with the facilitator properly set
-      this.room = this.createNewRoom(userId);
+      // Now create the room with the facilitator properly set and custom room name
+      this.room = this.createNewRoom(userId, roomName);
       console.log(`Created new room: ${this.party.id} with facilitator: ${userName}`);
       console.log('New room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
     } else if (!existingUser) {
@@ -439,7 +450,7 @@ export default class RetroRoomServer implements Party.Server {
     });
   }
 
-  private createNewRoom(facilitatorId: string): IRetroRoom {
+  private createNewRoom(facilitatorId: string, roomName: string): IRetroRoom {
     // Get the facilitator user from the users map
     const facilitator = this.users.get(facilitatorId);
     
@@ -455,7 +466,7 @@ export default class RetroRoomServer implements Party.Server {
       };
       return {
         id: this.party.id,
-        name: `Retro Room ${this.party.id}`,
+        name: roomName,
         phase: 'ideation',
         facilitatorId,
         createdAt: new Date(),
@@ -475,7 +486,7 @@ export default class RetroRoomServer implements Party.Server {
     
     return {
       id: this.party.id,
-      name: `Retro Room ${this.party.id}`,
+      name: roomName,
       phase: 'ideation',
       facilitatorId,
       createdAt: new Date(),
@@ -494,56 +505,45 @@ export default class RetroRoomServer implements Party.Server {
   }
 
   private async loadRoomData() {
+    if (!this.redis) {
+      console.log('Redis not configured, using in-memory storage');
+      return;
+    }
+
     try {
-      // Check if we have Redis environment variables
-      if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-        console.log('Redis not configured, using in-memory storage');
-        return;
-      }
-
-      const response = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/room:${this.party.id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.result) {
-          // The result is already a parsed object, no need for JSON.parse
-          const parsed = data.result;
-          // Convert date strings back to Date objects
-          this.room = {
-            ...parsed,
-            createdAt: new Date(parsed.createdAt),
-            updatedAt: new Date(parsed.updatedAt),
-            cards: parsed.cards.map((card: any) => ({
-              ...card,
-              createdAt: new Date(card.createdAt),
-              updatedAt: new Date(card.updatedAt),
-              reactions: card.reactions.map((r: any) => ({
-                ...r,
-                createdAt: new Date(r.createdAt)
-              }))
-            })),
-            votes: parsed.votes.map((vote: any) => ({
-              ...vote,
-              createdAt: new Date(vote.createdAt)
-            })),
-            users: parsed.users.map((user: any) => ({
-              ...user,
-              joinedAt: new Date(user.joinedAt),
-              lastSeen: new Date(user.lastSeen)
-            })),
-            phaseTimer: parsed.phaseTimer ? {
-              ...parsed.phaseTimer,
-              startTime: new Date(parsed.phaseTimer.startTime)
-            } : undefined
-          };
-          console.log(`Loaded room data for ${this.party.id} from Redis`);
-        }
+      const data = await this.redis.get(`room:${this.party.id}`);
+      if (data) {
+        // Parse the JSON string back to an object
+        const parsed = JSON.parse(data as string) as IRetroRoom;
+        // Convert date strings back to Date objects
+        this.room = {
+          ...parsed,
+          createdAt: new Date(parsed.createdAt),
+          updatedAt: new Date(parsed.updatedAt),
+          cards: parsed.cards.map((card: any) => ({
+            ...card,
+            createdAt: new Date(card.createdAt),
+            updatedAt: new Date(card.updatedAt),
+            reactions: card.reactions.map((r: any) => ({
+              ...r,
+              createdAt: new Date(r.createdAt)
+            }))
+          })),
+          votes: parsed.votes.map((vote: any) => ({
+            ...vote,
+            createdAt: new Date(vote.createdAt)
+          })),
+          users: parsed.users.map((user: any) => ({
+            ...user,
+            joinedAt: new Date(user.joinedAt),
+            lastSeen: new Date(user.lastSeen)
+          })),
+          phaseTimer: parsed.phaseTimer ? {
+            ...parsed.phaseTimer,
+            startTime: new Date(parsed.phaseTimer.startTime)
+          } : undefined
+        };
+        console.log(`Loaded room data for ${this.party.id} from Redis`);
       }
     } catch (error) {
       console.error('Error loading room data:', error);
@@ -551,67 +551,16 @@ export default class RetroRoomServer implements Party.Server {
   }
 
   private async saveRoomData() {
+    if (!this.redis) {
+      console.log('Redis not configured, using in-memory storage');
+      return;
+    }
+
     if (!this.room) return;
 
     try {
-      // Check if we have Redis environment variables
-      if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-        console.log('Redis not configured, using in-memory storage');
-        return;
-      }
-
       // Save to Redis with 6-hour TTL (21600 seconds)
-      const response = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/set/room:${this.party.id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          value: this.room, // Send the object directly, let the API handle serialization
-          ex: 21600 // 6 hours in seconds (21600 = 6 * 60 * 60)
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Redis save response:', errorText);
-        throw new Error(`Redis save failed: ${response.statusText} - ${errorText}`);
-      }
-
-      // Verify TTL was set by checking the TTL of the key
-      const ttlResponse = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/ttl/room:${this.party.id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (ttlResponse.ok) {
-        const ttlData = await ttlResponse.json();
-        console.log(`Room ${this.party.id} TTL: ${ttlData.result} seconds`);
-        
-        // If TTL is not set (returns -1), try to set it manually
-        if (ttlData.result === -1) {
-          console.log(`Setting TTL manually for room ${this.party.id}`);
-          const expireResponse = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/expire/room:${this.party.id}`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              seconds: 21600
-            })
-          });
-          
-          if (expireResponse.ok) {
-            console.log(`Manually set TTL for room ${this.party.id}`);
-          }
-        }
-      }
-
+      await this.redis.set(`room:${this.party.id}`, JSON.stringify(this.room), { ex: 21600 });
       console.log(`Saved room data for ${this.party.id} with 6-hour TTL`);
     } catch (error) {
       console.error('Error saving room data:', error);

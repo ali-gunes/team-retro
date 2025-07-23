@@ -22,8 +22,10 @@ export default function CreatePage() {
       // Generate a random room ID
       const roomId = Math.random().toString(36).substring(2, 8)
       
-      // In a real app, you might create the room via API
-      // For now, we'll just redirect to the room
+      // Store the room name in localStorage for the room page to access
+      localStorage.setItem(`room-name-${roomId}`, roomName.trim())
+      
+      // Navigate to the room without URL parameters
       router.push(`/room/${roomId}`)
     } catch (error) {
       console.error('Failed to create room:', error)

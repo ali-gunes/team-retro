@@ -16,12 +16,11 @@ interface RetroBoardProps {
   }
   isConnected: boolean
   userId: string
+  columns?: RetroColumnType[]
 }
 
-export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProps) {
+export function RetroBoard({ room, socket, isConnected, userId, columns = ['poll', 'start', 'stop', 'action'] }: RetroBoardProps) {
   const [selectedColumn, setSelectedColumn] = useState<RetroColumnType | null>(null)
-
-  const columns: RetroColumnType[] = ['poll', 'start', 'stop', 'action']
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return
@@ -62,9 +61,13 @@ export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProp
       /> */}
 
       {/* Main Board */}
-      <div className="flex-1 container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className={`grid gap-6 ${
+            columns.length === 3 
+              ? 'grid-cols-1 md:grid-cols-3 max-w-4xl mx-auto' 
+              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
+          }`}>
             {columns.map((column) => (
               <RetroColumn
                 key={column}

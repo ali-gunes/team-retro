@@ -6,6 +6,19 @@ export interface User {
   lastSeen: Date;
 }
 
+export interface Poll {
+  question: string
+  type: 'yes_no' | 'scale_1_5' | 'multiple_choice' | 'emoji_scale'
+  options?: string[]
+}
+
+export interface PollVote {
+  pollId: string
+  userId: string
+  value: number | string
+  createdAt: Date
+}
+
 export interface Card {
   id: string;
   content: string;
@@ -50,6 +63,8 @@ export interface RetroRoom {
   cards: Card[];
   votes: Vote[];
   users: User[];
+  polls: Poll[];
+  pollVotes: PollVote[];
   settings: RoomSettings;
   phaseTimer?: PhaseTimer;
 }
@@ -77,10 +92,10 @@ export interface ExportFormat {
 }
 
 export interface PartyMessage {
-  type: 'room_state' | 'card_added' | 'card_updated' | 'card_deleted' | 'vote_added' | 'vote_removed' | 'reaction_added' | 'reaction_removed' | 'phase_changed' | 'user_joined' | 'user_left' | 'room_settings_updated' | 'error';
+  type: PartyMessageType;
   payload: any;
   timestamp: Date;
-  userId?: string;
+  userId: string;
 }
 
 export interface RedisRoomData {
@@ -132,3 +147,20 @@ export interface ApiResponse<T = any> {
   error?: string;
   message?: string;
 } 
+
+export type PartyMessageType = 
+  | 'user_joined' 
+  | 'room_state' 
+  | 'card_added' 
+  | 'card_updated' 
+  | 'card_deleted' 
+  | 'vote_added' 
+  | 'vote_removed' 
+  | 'reaction_added' 
+  | 'reaction_removed' 
+  | 'poll_vote_added'
+  | 'poll_vote_removed'
+  | 'phase_changed' 
+  | 'user_left' 
+  | 'room_settings_updated' 
+  | 'error'; 

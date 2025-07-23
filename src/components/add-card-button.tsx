@@ -72,7 +72,7 @@ export function AddCardButton({ column, socket, room }: AddCardButtonProps) {
       variant="outline"
       size="sm"
       onClick={() => setIsAdding(true)}
-      className="w-full mt-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+      className="w-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
     >
       <Plus className="h-4 w-4 mr-2" />
       Add Card

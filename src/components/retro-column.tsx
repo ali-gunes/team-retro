@@ -2,8 +2,9 @@
 
 import { Droppable, Draggable } from '@hello-pangea/dnd'
 import { RetroCard } from './retro-card'
+import { PollCard } from './poll-card'
 import { AddCardButton } from './add-card-button'
-import type { RetroRoom, RetroColumn as RetroColumnType, Card } from '@/types'
+import type { RetroRoom, RetroColumn as RetroColumnType, Card, Poll, PollVote } from '@/types'
 
 interface RetroColumnProps {
   column: RetroColumnType
@@ -85,19 +86,33 @@ export function RetroColumn({
       </div>
 
       {/* Column Content */}
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-b-lg border border-gray-200 dark:border-gray-700 p-4 min-h-[400px]">
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-b-lg border border-gray-200 dark:border-gray-700 p-4 min-h-[400px] max-h-[600px] flex flex-col">
         <Droppable droppableId={column}>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className={`h-full transition-colors duration-200 ${
+              className={`flex-1 overflow-y-auto transition-colors duration-200 ${
                 snapshot.isDraggingOver ? 'bg-blue-50 dark:bg-blue-900/20' : ''
               }`}
             >
+              {/* Polls (only in poll column) */}
+              {column === 'poll' && room.polls && room.polls.map((poll, index) => (
+                <div key={`poll-${index}`} className="mb-3">
+                  <PollCard
+                    poll={poll}
+                    pollId={`poll-${index}`}
+                    room={room}
+                    socket={socket}
+                    userId={userId}
+                    votes={room.pollVotes || []}
+                  />
+                </div>
+              ))}
+
               {/* Cards */}
               {cards.map((card, index) => (
-                <Draggable key={card.id} draggableId={card.id} index={index}>
+                <Draggable key={card.id} draggableId={card.id} index={column === 'poll' ? room.polls?.length + index : index}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
@@ -121,12 +136,14 @@ export function RetroColumn({
               {provided.placeholder}
 
               {/* Add Card Button */}
-              {!isLocked && (
-                <AddCardButton
-                  column={column}
-                  socket={socket}
-                  room={room}
-                />
+              {!isLocked && column !== 'poll' && (
+                <div className="mt-3">
+                  <AddCardButton
+                    column={column}
+                    socket={socket}
+                    room={room}
+                  />
+                </div>
               )}
             </div>
           )}

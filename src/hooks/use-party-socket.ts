@@ -7,6 +7,7 @@ interface PartySocketOptions {
   userName?: string
   isFacilitator?: boolean
   roomName?: string
+  selectedPolls?: any[]
   onMessage?: (event: MessageEvent) => void
   onOpen?: () => void
   onClose?: () => void
@@ -51,6 +52,9 @@ export function usePartySocket(options: PartySocketOptions) {
       }
       if (optionsRef.current.roomName) {
         url.searchParams.set('roomName', optionsRef.current.roomName)
+      }
+      if (optionsRef.current.selectedPolls && optionsRef.current.selectedPolls.length > 0) {
+        url.searchParams.set('selectedPolls', JSON.stringify(optionsRef.current.selectedPolls))
       }
       
       console.log('Attempting to connect to:', url.toString())

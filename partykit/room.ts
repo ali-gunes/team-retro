@@ -38,6 +38,7 @@ export default class RetroRoomServer implements Party.Server {
     const userId = url.searchParams.get('userId') || ctx.request.headers.get('x-user-id') || uuidv4();
     const userName = 'Anonymous'; // Always use Anonymous
     const roomName = url.searchParams.get('roomName') || '';
+    const selectedPollsParam = url.searchParams.get('selectedPolls');
 
     console.log(`User attempting to connect: ${userName} (${userId})`)
 
@@ -74,8 +75,18 @@ export default class RetroRoomServer implements Party.Server {
       this.users.set(userId, user);
       ws.setState({ userId, userName, isFacilitator: true });
       
+      // Parse selected polls if provided
+      let selectedPolls: any[] = [];
+      if (selectedPollsParam) {
+        try {
+          selectedPolls = JSON.parse(selectedPollsParam);
+        } catch (error) {
+          console.error('Failed to parse selected polls:', error);
+        }
+      }
+      
       // Now create the room with the facilitator properly set and custom room name
-      this.room = this.createNewRoom(userId, roomName);
+      this.room = this.createNewRoom(userId, roomName, selectedPolls);
       console.log(`Created new room: ${this.party.id} with facilitator: ${userName}`);
       console.log('New room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
     } else if (!existingUser) {
@@ -162,6 +173,12 @@ export default class RetroRoomServer implements Party.Server {
           break;
         case 'reaction_removed':
           await this.handleReactionRemoved(data.payload as ReactionRequest, userId, userName);
+          break;
+        case 'poll_vote_added':
+          await this.handlePollVoteAdded(data.payload as any, userId, userName);
+          break;
+        case 'poll_vote_removed':
+          await this.handlePollVoteRemoved(data.payload as any, userId, userName);
           break;
         // TODO: Phase functionality might be implemented in the future
         // case 'phase_changed':
@@ -387,24 +404,107 @@ export default class RetroRoomServer implements Party.Server {
   private async handleReactionRemoved(request: ReactionRequest, userId: string, userName: string) {
     if (!this.room) return;
 
-    const card = this.room.cards.find(c => c.id === request.cardId);
-    if (!card) return;
+    const { cardId, emoji } = request;
+    const card = this.room.cards.find(c => c.id === cardId);
+    
+    if (!card) {
+      console.error(`Card not found: ${cardId}`);
+      return;
+    }
 
-    const reactionIndex = card.reactions.findIndex(r => r.emoji === request.emoji && r.userId === userId);
-    if (reactionIndex === -1) return;
+    // Remove the reaction
+    const reactionIndex = card.reactions.findIndex(r => 
+      r.emoji === emoji && r.userId === userId
+    );
 
-    const removedReaction = card.reactions[reactionIndex];
-    card.reactions.splice(reactionIndex, 1);
+    if (reactionIndex !== -1) {
+      const removedReaction = card.reactions[reactionIndex];
+      card.reactions.splice(reactionIndex, 1);
+      card.updatedAt = new Date();
+      this.room.updatedAt = new Date();
+      await this.saveRoomData();
+
+      const broadcastMessage: PartyMessage = {
+        type: 'reaction_removed',
+        payload: {
+          cardId,
+          emoji,
+          userId,
+          userName
+        },
+        timestamp: new Date(),
+        userId
+      };
+      
+      console.log(`Broadcasting reaction_removed: ${emoji} from card ${cardId}`);
+      this.broadcast(broadcastMessage);
+    }
+  }
+
+  private async handlePollVoteAdded(request: any, userId: string, userName: string) {
+    if (!this.room) return;
+
+    const { pollId, value } = request;
+    
+    // Remove any existing vote from this user for this poll
+    this.room.pollVotes = this.room.pollVotes.filter(v => 
+      !(v.pollId === pollId && v.userId === userId)
+    );
+
+    // Add new vote
+    const pollVote = {
+      pollId,
+      userId,
+      value,
+      createdAt: new Date()
+    };
+
+    this.room.pollVotes.push(pollVote);
     this.room.updatedAt = new Date();
     await this.saveRoomData();
 
-    // Broadcast the updated card instead of just the removed reaction
-    this.broadcast({
-      type: 'card_updated',
-      payload: card,
+    const broadcastMessage: PartyMessage = {
+      type: 'poll_vote_added',
+      payload: pollVote,
       timestamp: new Date(),
       userId
-    });
+    };
+    
+    console.log(`Broadcasting poll_vote_added: ${pollId} by ${userName}`);
+    this.broadcast(broadcastMessage);
+  }
+
+  private async handlePollVoteRemoved(request: any, userId: string, userName: string) {
+    if (!this.room) return;
+
+    const { pollId } = request;
+    
+    // Remove vote from this user for this poll
+    const removedVote = this.room.pollVotes.find(v => 
+      v.pollId === pollId && v.userId === userId
+    );
+
+    if (removedVote) {
+      this.room.pollVotes = this.room.pollVotes.filter(v => 
+        !(v.pollId === pollId && v.userId === userId)
+      );
+      this.room.updatedAt = new Date();
+      await this.saveRoomData();
+
+      const broadcastMessage: PartyMessage = {
+        type: 'poll_vote_removed',
+        payload: {
+          pollId,
+          userId,
+          userName
+        },
+        timestamp: new Date(),
+        userId
+      };
+      
+      console.log(`Broadcasting poll_vote_removed: ${pollId} by ${userName}`);
+      this.broadcast(broadcastMessage);
+    }
   }
 
   // TODO: Phase functionality might be implemented in the future
@@ -450,7 +550,7 @@ export default class RetroRoomServer implements Party.Server {
     });
   }
 
-  private createNewRoom(facilitatorId: string, roomName: string): IRetroRoom {
+  private createNewRoom(facilitatorId: string, roomName: string, selectedPolls: any[]): IRetroRoom {
     // Get the facilitator user from the users map
     const facilitator = this.users.get(facilitatorId);
     
@@ -480,7 +580,9 @@ export default class RetroRoomServer implements Party.Server {
           allowReactions: true,
           lockedColumns: [],
           phaseDuration: 10
-        }
+        },
+        polls: [], // Initialize polls array
+        pollVotes: [] // Initialize pollVotes array
       };
     }
     
@@ -500,7 +602,9 @@ export default class RetroRoomServer implements Party.Server {
         allowReactions: true,
         lockedColumns: [],
         phaseDuration: 10
-      }
+      },
+      polls: selectedPolls, // Pass selected polls to the new room
+      pollVotes: [] // Initialize pollVotes array
     };
   }
 

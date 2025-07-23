@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Heart, MessageCircle, MoreHorizontal } from 'lucide-react'
+import { Heart, MessageCircle, MoreHorizontal, Trash2 } from 'lucide-react'
 import { Button } from './ui/button'
 import type { Card, RetroRoom } from '@/types'
 
@@ -19,6 +19,25 @@ interface RetroCardProps {
 export function RetroCard({ card, room, socket, isLocked, userId }: RetroCardProps) {
   const [showReactions, setShowReactions] = useState(false)
   const [isVoted, setIsVoted] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showMenu])
 
   const handleVote = () => {
     if (isLocked || !room.settings.allowVoting) return
@@ -69,7 +88,22 @@ export function RetroCard({ card, room, socket, isLocked, userId }: RetroCardPro
     }
   }
 
+  const handleDelete = () => {
+    if (isLocked) return
+    
+    socket.send({
+      type: 'card_deleted',
+      payload: {
+        id: card.id
+      }
+    })
+    setShowMenu(false)
+  }
+
   const commonReactions = ['👍', '❤️', '😄', '😮', '😢', '😡']
+
+  // Check if current user is the card author
+  const isCardAuthor = card.authorId === userId
 
   return (
     <div className={`retro-card ${card.isHighlighted ? 'ring-2 ring-yellow-400' : ''}`}>
@@ -80,13 +114,32 @@ export function RetroCard({ card, room, socket, isLocked, userId }: RetroCardPro
             {card.authorName} • {new Date(card.createdAt).toLocaleTimeString()}
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 opacity-50 hover:opacity-100"
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
+        {isCardAuthor && (
+          <div className="relative" ref={menuRef}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 opacity-50 hover:opacity-100"
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+            
+            {/* Dropdown Menu */}
+            {showMenu && (
+              <div className="absolute right-0 top-8 z-10 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[120px]">
+                <button
+                  onClick={handleDelete}
+                  disabled={isLocked}
+                  className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete Card</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Card Content */}

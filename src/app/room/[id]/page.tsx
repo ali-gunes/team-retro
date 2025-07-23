@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { RetroBoard } from '@/components/retro-board'
 import { usePartySocket } from '@/hooks/use-party-socket'
-import type { RetroRoom, PartyMessage } from '@/types'
+import type { RetroRoom, PartyMessage, RetroColumn as RetroColumnType } from '@/types'
 
 export default function RoomPage() {
   const params = useParams()
@@ -29,6 +29,18 @@ export default function RoomPage() {
     return processRoomName(rawName)
   })
 
+  // Get selected polls from localStorage
+  const [selectedPolls] = useState(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const pollsData = localStorage.getItem(`room-polls-${roomId}`)
+      return pollsData ? JSON.parse(pollsData) : []
+    } catch (error) {
+      console.error('Failed to parse polls data:', error)
+      return []
+    }
+  })
+
   // Generate a stable user ID for this session
   const [userId] = useState(() => {
     if (typeof window === 'undefined') return 'user-temp'
@@ -47,6 +59,7 @@ export default function RoomPage() {
     userName: 'Anonymous', // Always use Anonymous
     isFacilitator: false, // You can make this configurable
     roomName, // Pass room name from localStorage to backend
+    selectedPolls, // Pass selected polls to backend
     onMessage: (event: MessageEvent) => {
       const message = JSON.parse(event.data) as PartyMessage
       console.log('Received message:', message.type, message.payload)
@@ -64,9 +77,17 @@ export default function RoomPage() {
       console.error('WebSocket error in room page:', error)
       setIsConnected(false)
     },
-  }), [roomId, userId, roomName])
+  }), [roomId, userId, roomName, selectedPolls])
 
   const socket = usePartySocket(socketOptions)
+
+  // Define columns based on whether polls are selected
+  const columns: RetroColumnType[] = useMemo(() => {
+    const baseColumns: RetroColumnType[] = ['start', 'stop', 'action']
+    // Use room state polls if available, otherwise fall back to localStorage
+    const hasPolls = (room?.polls && room.polls.length > 0) || selectedPolls.length > 0
+    return hasPolls ? ['poll', ...baseColumns] : baseColumns
+  }, [room?.polls?.length, selectedPolls.length])
 
   const handleMessage = (message: PartyMessage) => {
     console.log('Handling message:', message.type, message.payload)
@@ -106,6 +127,8 @@ export default function RoomPage() {
       case 'vote_removed':
       case 'reaction_added':
       case 'reaction_removed':
+      case 'poll_vote_added':
+      case 'poll_vote_removed':
       // TODO: Phase functionality might be implemented in the future
       // case 'phase_changed':
       case 'room_settings_updated':
@@ -201,6 +224,27 @@ export default function RoomPage() {
           ),
           updatedAt: new Date()
         }
+      case 'poll_vote_added':
+        const pollVote = message.payload as any
+        return {
+          ...currentRoom,
+          pollVotes: [
+            ...currentRoom.pollVotes.filter(v => 
+              !(v.pollId === pollVote.pollId && v.userId === pollVote.userId)
+            ),
+            pollVote
+          ],
+          updatedAt: new Date()
+        }
+      case 'poll_vote_removed':
+        const removedPollVote = message.payload as any
+        return {
+          ...currentRoom,
+          pollVotes: currentRoom.pollVotes.filter(v => 
+            !(v.pollId === removedPollVote.pollId && v.userId === removedPollVote.userId)
+          ),
+          updatedAt: new Date()
+        }
       // TODO: Phase functionality might be implemented in the future
       // case 'phase_changed':
       //   const { phase, timer } = message.payload as any
@@ -268,6 +312,7 @@ export default function RoomPage() {
         socket={socket}
         isConnected={isConnected}
         userId={userId}
+        columns={columns}
       />
     </div>
   )

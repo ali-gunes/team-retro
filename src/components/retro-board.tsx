@@ -21,7 +21,7 @@ interface RetroBoardProps {
 export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProps) {
   const [selectedColumn, setSelectedColumn] = useState<RetroColumnType | null>(null)
 
-  const columns: RetroColumnType[] = ['start', 'stop', 'action', 'poll']
+  const columns: RetroColumnType[] = ['poll', 'start', 'stop', 'action']
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return
@@ -47,7 +47,7 @@ export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProp
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Header */}
       <RoomHeader 
         room={room} 
@@ -62,7 +62,7 @@ export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProp
       /> */}
 
       {/* Main Board */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex-1 container mx-auto px-4 py-8">
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {columns.map((column) => (
@@ -81,6 +81,15 @@ export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProp
           </div>
         </DragDropContext>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            C&I ekibi için ❤️ ve ☕️ ile yapılmıştır.
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 

@@ -16,14 +16,26 @@ interface RoomHeaderProps {
 
 export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
   const [showSettings, setShowSettings] = useState(false)
+  const [showCopiedToast, setShowCopiedToast] = useState(false)
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/room/${room.id}`
+    const joinUrl = `${window.location.origin}/room/${room.id}`
+    
     try {
-      await navigator.clipboard.writeText(url)
-      // You could add a toast notification here
+      await navigator.clipboard.writeText(joinUrl)
+      setShowCopiedToast(true)
+      setTimeout(() => setShowCopiedToast(false), 2000) // Hide toast after 2 seconds
     } catch (error) {
       console.error('Failed to copy URL:', error)
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = joinUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      setShowCopiedToast(true)
+      setTimeout(() => setShowCopiedToast(false), 2000)
     }
   }
 
@@ -56,22 +68,24 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
             </Button>
             
             {/* Connection Status - Shows if WebSocket is connected to the server */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 group relative">
               {isConnected ? (
                 <Wifi className="h-4 w-4 text-green-500" />
               ) : (
                 <WifiOff className="h-4 w-4 text-red-500" />
               )}
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {isConnected ? 'Connected' : 'Disconnected'}
-              </span>
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+                <span className="bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap">
+                  {isConnected ? 'Connected' : 'Disconnected'}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Center - Room Name */}
           <div className="text-center">
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Retro Room: {room.name}
+              {room.name}
             </h1>
           </div>
 
@@ -89,6 +103,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
             </Button>
 
             {/* Settings Button (Facilitator Only) */}
+            {/* TODO: Settings functionality will be implemented later
             {isFacilitator && (
               <Button
                 variant="outline"
@@ -100,6 +115,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
                 Settings
               </Button>
             )}
+            */}
 
             {/* Participant Count */}
             <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -110,6 +126,16 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
             <ThemeToggle />
           </div>
         </div>
+
+        {/* Toast Notification */}
+        {showCopiedToast && (
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-in slide-in-from-top-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-white rounded-full"></div>
+              <span>Join link copied to clipboard!</span>
+            </div>
+          </div>
+        )}
 
         {/* Phase Info */}
         {/* TODO: Phase functionality might be implemented in the future */}
@@ -141,6 +167,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
         */}
 
         {/* Settings Panel */}
+        {/* TODO: Settings functionality will be implemented later
         {showSettings && isFacilitator && (
           <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -206,6 +233,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
             </div>
           </div>
         )}
+        */}
       </div>
     </header>
   )

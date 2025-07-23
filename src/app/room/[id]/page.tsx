@@ -13,10 +13,20 @@ export default function RoomPage() {
   const [isConnected, setIsConnected] = useState(false)
   const processedMessages = useRef(new Set<string>())
 
-  // Get room name from localStorage
+  // Function to process room name: trim whitespace and capitalize initials
+  const processRoomName = (name: string): string => {
+    return name
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+  }
+
+  // Get room name from localStorage and process it
   const [roomName] = useState(() => {
     if (typeof window === 'undefined') return ''
-    return localStorage.getItem(`room-name-${roomId}`) || ''
+    const rawName = localStorage.getItem(`room-name-${roomId}`) || ''
+    return processRoomName(rawName)
   })
 
   // Generate a stable user ID for this session

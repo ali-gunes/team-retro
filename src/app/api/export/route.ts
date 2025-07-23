@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // For now, we'll return a mock response
     const roomData: RetroRoom = {
       id: roomId,
-      name: `Retro Room ${roomId}`,
+      name: `Room ${roomId}`,
       phase: 'ideation',
       facilitatorId: 'facilitator-1',
       createdAt: new Date(),

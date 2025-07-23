@@ -47,7 +47,23 @@ export default class RetroRoomServer implements Party.Server {
     // If room doesn't exist, create it
     let isFacilitator = false;
     if (!this.room) {
+      // First user to connect becomes the facilitator
       isFacilitator = true;
+      
+      // Create the user object first
+      const user: User = {
+        id: userId,
+        name: userName,
+        isFacilitator: true, // First user is always facilitator
+        joinedAt: new Date(),
+        lastSeen: new Date()
+      };
+      
+      // Add to users map before creating room
+      this.users.set(userId, user);
+      ws.setState({ userId, userName, isFacilitator: true });
+      
+      // Now create the room with the facilitator properly set
       this.room = this.createNewRoom(userId);
       console.log(`Created new room: ${this.party.id} with facilitator: ${userName}`);
       console.log('New room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
@@ -82,14 +98,6 @@ export default class RetroRoomServer implements Party.Server {
       ws.setState({ userId, userName, isFacilitator });
       console.log(`User ${userName} reconnected to room: ${this.party.id}`);
       console.log('Reconnected room users:', this.room.users.map(u => ({ id: u.id, name: u.name, isFacilitator: u.isFacilitator })));
-    }
-
-    // If this is the very first user (room just created), set up their state
-    if (!existingUser && this.room && this.room.users.length === 1) {
-      const facilitator = this.room.users[0];
-      facilitator.isFacilitator = true;
-      this.users.set(facilitator.id, facilitator);
-      ws.setState({ userId: facilitator.id, userName: facilitator.name, isFacilitator: true });
     }
 
     // Save room data after any changes

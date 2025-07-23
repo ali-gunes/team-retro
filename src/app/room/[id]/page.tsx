@@ -89,7 +89,8 @@ export default function RoomPage() {
       case 'vote_removed':
       case 'reaction_added':
       case 'reaction_removed':
-      case 'phase_changed':
+      // TODO: Phase functionality might be implemented in the future
+      // case 'phase_changed':
       case 'room_settings_updated':
       case 'user_joined':
       case 'user_left':
@@ -183,14 +184,15 @@ export default function RoomPage() {
           ),
           updatedAt: new Date()
         }
-      case 'phase_changed':
-        const { phase, timer } = message.payload as any
-        return {
-          ...currentRoom,
-          phase,
-          phaseTimer: timer,
-          updatedAt: new Date()
-        }
+      // TODO: Phase functionality might be implemented in the future
+      // case 'phase_changed':
+      //   const { phase, timer } = message.payload as any
+      //   return {
+      //     ...currentRoom,
+      //     phase,
+      //     phaseTimer: timer,
+      //     updatedAt: new Date()
+      //   }
       case 'room_settings_updated':
         return {
           ...currentRoom,

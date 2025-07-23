@@ -152,11 +152,12 @@ export default class RetroRoomServer implements Party.Server {
         case 'reaction_removed':
           await this.handleReactionRemoved(data.payload as ReactionRequest, userId, userName);
           break;
-        case 'phase_changed':
-          if (isFacilitator) {
-            await this.handlePhaseChanged(data.payload as PhaseChangeRequest, userId, userName);
-          }
-          break;
+        // TODO: Phase functionality might be implemented in the future
+        // case 'phase_changed':
+        //   if (isFacilitator) {
+        //     await this.handlePhaseChanged(data.payload as PhaseChangeRequest, userId, userName);
+        //   }
+        //   break;
         case 'room_settings_updated':
           if (isFacilitator) {
             await this.handleRoomSettingsUpdated(data.payload as RoomSettingsUpdateRequest, userId, userName);
@@ -395,32 +396,33 @@ export default class RetroRoomServer implements Party.Server {
     });
   }
 
-  private async handlePhaseChanged(request: PhaseChangeRequest, userId: string, userName: string) {
-    if (!this.room) return;
+  // TODO: Phase functionality might be implemented in the future
+  // private async handlePhaseChanged(request: PhaseChangeRequest, userId: string, userName: string) {
+  //   if (!this.room) return;
 
-    this.room.phase = request.phase;
-    this.room.updatedAt = new Date();
+  //   this.room.phase = request.phase;
+  //   this.room.updatedAt = new Date();
 
-    if (request.startTimer) {
-      this.room.phaseTimer = {
-        phase: request.phase,
-        startTime: new Date(),
-        duration: this.room.settings.phaseDuration,
-        isActive: true
-      };
-    } else {
-      this.room.phaseTimer = undefined;
-    }
+  //   if (request.startTimer) {
+  //     this.room.phaseTimer = {
+  //       phase: request.phase,
+  //       startTime: new Date(),
+  //       duration: this.room.settings.phaseDuration,
+  //       isActive: true
+  //     };
+  //   } else {
+  //     this.room.phaseTimer = undefined;
+  //   }
 
-    await this.saveRoomData();
+  //   await this.saveRoomData();
 
-    this.broadcast({
-      type: 'phase_changed',
-      payload: { phase: request.phase, timer: this.room.phaseTimer },
-      timestamp: new Date(),
-      userId
-    });
-  }
+  //   this.broadcast({
+  //     type: 'phase_changed',
+  //     payload: { phase: request.phase, timer: this.room.phaseTimer },
+  //     timestamp: new Date(),
+  //     userId
+  //   });
+  // }
 
   private async handleRoomSettingsUpdated(request: RoomSettingsUpdateRequest, userId: string, userName: string) {
     if (!this.room) return;

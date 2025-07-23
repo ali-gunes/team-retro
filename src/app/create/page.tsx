@@ -81,7 +81,7 @@ export default function CreatePage() {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              You'll be the facilitator of this room and can control phases, timers, and settings.
+              You'll be the facilitator of this room and can control settings.
             </p>
           </div>
         </div>

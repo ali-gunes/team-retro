@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { RetroColumn } from './retro-column'
-import { PhaseControls } from './phase-controls'
+// TODO: Phase functionality might be implemented in the future
+// import { PhaseControls } from './phase-controls'
 import { RoomHeader } from './room-header'
 import type { RetroRoom, RetroColumn as RetroColumnType } from '@/types'
 
@@ -55,10 +56,10 @@ export function RetroBoard({ room, socket, isConnected, userId }: RetroBoardProp
       />
 
       {/* Phase Controls */}
-      <PhaseControls 
+      {/* <PhaseControls 
         room={room}
         socket={socket}
-      />
+      /> */}
 
       {/* Main Board */}
       <div className="container mx-auto px-4 py-8">

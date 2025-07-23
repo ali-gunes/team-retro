@@ -105,6 +105,8 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
         </div>
 
         {/* Phase Info */}
+        {/* TODO: Phase functionality might be implemented in the future */}
+        {/* 
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
@@ -122,13 +124,17 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
                   Timer:
                 </span>
                 <span className="text-sm font-mono">
-                  {/* Timer display would go here */}
+                  Timer display would go here
                   10:00
                 </span>
               </div>
             )}
           </div>
+        </div>
+        */}
 
+        {/* Participant Count */}
+        <div className="mt-4 flex items-center justify-end">
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {room.users.length} participant{room.users.length !== 1 ? 's' : ''}
           </div>

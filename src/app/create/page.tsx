@@ -55,13 +55,13 @@ export default function CreatePage() {
   const getPollTypeLabel = (type: string) => {
     switch (type) {
       case 'yes_no':
-        return 'Yes/No'
+        return 'Evet/Hayır'
       case 'scale_1_5':
-        return 'Scale: 1-5'
+        return 'Ölçek: 1-5'
       case 'multiple_choice':
-        return 'Multiple Choice'
+        return 'Çoklu Seçim'
       case 'emoji_scale':
-        return 'Emoji Scale'
+        return 'Emoji Ölçeği'
       default:
         return type
     }
@@ -114,7 +114,7 @@ export default function CreatePage() {
         <header className="flex justify-between items-center mb-16">
           <Link href="/" className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
             <ArrowLeft className="h-5 w-5" />
-            <span>Back to Home</span>
+            <span>Ana Sayfaya Dön</span>
           </Link>
           <ThemeToggle />
         </header>
@@ -123,24 +123,24 @@ export default function CreatePage() {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Create New Room
+              Yeni Oda Oluştur
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Set up a new retrospective session for your team
+              Ekibiniz için yeni bir retrospektif oturumu oluşturun
             </p>
           </div>
 
           <form onSubmit={handleCreate} className="space-y-6">
             <div>
               <label htmlFor="roomName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Room Name
+                Oda Adı
               </label>
               <input
                 type="text"
                 id="roomName"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
-                placeholder="Enter room name..."
+                placeholder="Oda adını girin..."
                 className="retro-input"
                 required
               />
@@ -165,11 +165,11 @@ export default function CreatePage() {
                   </div>
                 </div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Enable Quick Polls
+                  Hızlı Anketleri Etkinleştir
                 </span>
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Add interactive polls to gather team feedback during the retrospective
+                Retrospektif sırasında ekip geri bildirimi toplamak için etkileşimli anketler ekleyin
               </p>
             </div>
 
@@ -177,7 +177,7 @@ export default function CreatePage() {
             {enablePolls && pollCategories.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Select Polls to Include
+                  Dahil Edilecek Anketleri Seçin
                 </h3>
                 
                 {/* Category Tabs */}
@@ -231,7 +231,7 @@ export default function CreatePage() {
                 
                 {selectedPolls.size > 0 && (
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {selectedPolls.size} poll{selectedPolls.size !== 1 ? 's' : ''} selected
+                    {selectedPolls.size} anket seçildi
                   </p>
                 )}
               </div>
@@ -242,13 +242,13 @@ export default function CreatePage() {
               disabled={isCreating || !roomName.trim() || (enablePolls && selectedPolls.size === 0)}
               className="w-full retro-button-primary"
             >
-              {isCreating ? 'Creating...' : 'Create Room'}
+              {isCreating ? 'Oluşturuluyor...' : 'Oda Oluştur'}
             </Button>
           </form>
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              You'll be the facilitator of this room and can control settings.
+              Bu odanın kolaylaştırıcısı olacaksınız ve ayarları kontrol edebileceksiniz.
             </p>
           </div>
         </div>

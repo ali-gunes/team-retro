@@ -21,28 +21,28 @@ interface RetroColumnProps {
 
 const columnConfig = {
   start: {
-    title: 'Start',
+    title: 'Devam',
     color: 'bg-retro-start',
     icon: '🚀',
-    description: 'What should we start doing?'
+    description: 'Neyi sürdürmeliyiz?'
   },
   stop: {
-    title: 'Stop',
+    title: 'Bırak',
     color: 'bg-retro-stop',
     icon: '🛑',
-    description: 'What should we stop doing?'
+    description: 'Ne yapmayı bırakmalıyız?'
   },
   action: {
-    title: 'Action',
+    title: 'Aksiyon',
     color: 'bg-retro-action',
     icon: '⚡',
-    description: 'What actions should we take?'
+    description: 'Hangi aksiyonları almalıyız?'
   },
   poll: {
-    title: 'Quick Polls',
+    title: 'Hızlı Anketler',
     color: 'bg-retro-poll',
     icon: '📊',
-    description: 'Quick team polls'
+    description: 'Hızlı ekip anketleri'
   }
 }
 
@@ -81,7 +81,7 @@ export function RetroColumn({
           )}
         </div>
         <div className="mt-2 text-sm opacity-75">
-          {cards.length} card{cards.length !== 1 ? 's' : ''}
+          {cards.length} kart{cards.length !== 1 ? '' : ''}
         </div>
       </div>
 

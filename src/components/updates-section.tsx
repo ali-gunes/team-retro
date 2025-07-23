@@ -16,36 +16,36 @@ const updates: Update[] = [
   {
     id: '1',
     type: 'version',
-    title: 'v1.2.0 - Poll System Launch',
-    description: 'Introducing interactive Quick Polls with real-time voting and categorized poll selection',
+    title: 'v1.2.0 - Anket Sistemi Lansmanı',
+    description: 'Gerçek zamanlı oylama ve kategorize edilmiş anket seçimi ile etkileşimli Hızlı Anketler tanıtılıyor',
     date: '2025-07-24'
   },
   {
     id: '2',
     type: 'feature',
-    title: 'Quick Polls System',
-    description: 'Add interactive polls during room creation with categories like Workplace, Sprint, Team, and more',
+    title: 'Hızlı Anketler Sistemi',
+    description: 'İş Yeri, Sprint, Ekip ve daha fazlası gibi kategorilerle oda oluşturma sırasında etkileşimli anketler ekleyin',
     date: '2025-07-24'
   },
   {
     id: '3',
     type: 'improvement',
-    title: 'Card Delete Functionality',
-    description: 'Added delete option for card authors with proper authorization and UI feedback',
+    title: 'Kart Silme İşlevi',
+    description: 'Kart yazarları için uygun yetkilendirme ve UI geri bildirimi ile silme seçeneği eklendi',
     date: '2025-07-23'
   },
   {
     id: '4',
     type: 'feature',
-    title: 'Share Room Links',
-    description: 'Copy room links to clipboard with toast notifications and automatic join functionality',
+    title: 'Oda Bağlantılarını Paylaş',
+    description: 'Toast bildirimleri ve otomatik katılım işlevi ile oda bağlantılarını panoya kopyalayın',
     date: '2025-07-23'
   },
   {
     id: '5',
     type: 'improvement',
-    title: 'Enhanced Room Creation',
-    description: 'Toggle-based poll selection with categorized tabs and improved user experience',
+    title: 'Geliştirilmiş Oda Oluşturma',
+    description: 'Kategorize edilmiş sekmeler ve geliştirilmiş kullanıcı deneyimi ile geçiş tabanlı anket seçimi',
     date: '2025-07-23'
   }
 ]
@@ -83,13 +83,13 @@ export function UpdatesSection() {
   const getUpdateTypeLabel = (type: Update['type']) => {
     switch (type) {
       case 'feature':
-        return 'New Feature'
+        return 'Yeni Özellik'
       case 'improvement':
-        return 'Improvement'
+        return 'İyileştirme'
       case 'bug-fix':
-        return 'Bug Fix'
+        return 'Hata Düzeltmesi'
       case 'version':
-        return 'Version'
+        return 'Sürüm'
       default:
         return type
     }
@@ -122,14 +122,14 @@ export function UpdatesSection() {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Latest Updates
+          Son Güncellemeler
         </h2>
         <Button
           variant="outline"
           onClick={() => setShowAllUpdates(!showAllUpdates)}
           className="retro-button-secondary"
         >
-          {showAllUpdates ? 'Show Carousel' : 'All Updates'}
+          {showAllUpdates ? 'Gizle' : 'Tüm Güncellemeler'}
         </Button>
       </div>
 

@@ -102,7 +102,7 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
     const scaleVotes = votes.filter(v => v.pollId === pollId && typeof v.value === 'number')
     if (scaleVotes.length === 0) return 0
     const sum = scaleVotes.reduce((acc, vote) => acc + (vote.value as number), 0)
-    return (sum / scaleVotes.length).toFixed(1)
+    return sum / scaleVotes.length
   }
 
   return (
@@ -122,27 +122,78 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
 
       {/* Poll Content */}
       <div className="space-y-3">
+        {poll.type === 'yes_no' && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Evet/Hayır
+              </span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {getTotalVotes()} oy
+              </span>
+            </div>
+
+            {/* Yes/No Options */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => handleVote('Yes')}
+                disabled={isUpdating}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  userVote === 'Yes'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                Evet
+              </button>
+              <button
+                onClick={() => handleVote('No')}
+                disabled={isUpdating}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  userVote === 'No'
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                Hayır
+              </button>
+            </div>
+
+            {/* Results Display */}
+            {getTotalVotes() > 0 && (
+              <div className="mt-2 flex items-center justify-between text-xs">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Evet: <span className="font-semibold text-green-600 dark:text-green-400">{getVoteCount('Yes')}</span>
+                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Hayır: <span className="font-semibold text-red-600 dark:text-red-400">{getVoteCount('No')}</span>
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {poll.type === 'scale_1_5' && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Scale: 1 - 5
+                Ölçek: 1-5
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {getTotalVotes()} vote{getTotalVotes() !== 1 ? 's' : ''}
+                {getTotalVotes()} oy
               </span>
             </div>
-            
+
             {/* Scale Options */}
-            <div className="flex items-center space-x-2">
-              {Array.from({ length: 5 }, (_, i) => i + 1).map((value) => (
+            <div className="flex items-center space-x-1">
+              {[1, 2, 3, 4, 5].map((value) => (
                 <button
                   key={value}
                   onClick={() => handleVote(value)}
                   disabled={isUpdating}
-                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex-1 py-2 px-1 rounded-md text-sm font-medium transition-colors ${
                     userVote === value
-                      ? 'bg-purple-500 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -151,55 +202,25 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
               ))}
             </div>
 
-            {/* Average Display */}
-            {getTotalVotes() > 0 && (
-              <div className="mt-2 text-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Average: <span className="font-semibold text-purple-600 dark:text-purple-400">{getAverageVote()}</span>
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {poll.type === 'yes_no' && (
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Yes/No
-              </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {getTotalVotes()} vote{getTotalVotes() !== 1 ? 's' : ''}
-              </span>
-            </div>
-            
-            {/* Yes/No Options */}
-            <div className="flex items-center space-x-2">
-              {['Yes', 'No'].map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleVote(option)}
-                  disabled={isUpdating}
-                  className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                    userVote === option
-                      ? 'bg-purple-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-
             {/* Results Display */}
             {getTotalVotes() > 0 && (
-              <div className="mt-2 flex items-center justify-center space-x-4">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes: <span className="font-semibold text-green-600 dark:text-green-400">{getVoteCount('Yes')}</span>
-                </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  No: <span className="font-semibold text-red-600 dark:text-red-400">{getVoteCount('No')}</span>
-                </span>
+              <div className="mt-2">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-gray-500 dark:text-gray-400">Ortalama:</span>
+                  <span className="font-semibold text-blue-600 dark:text-blue-400">
+                    {getAverageVote().toFixed(1)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-1">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <div key={value} className="text-center">
+                      <div className="text-xs font-medium">{value}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {getVoteCount(value)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -209,10 +230,10 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Emoji Scale
+                Emoji Ölçeği
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {getTotalVotes()} vote{getTotalVotes() !== 1 ? 's' : ''}
+                {getTotalVotes()} oy
               </span>
             </div>
 
@@ -254,10 +275,10 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Multiple Choice
+                Çoklu Seçim
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {getTotalVotes()} vote{getTotalVotes() !== 1 ? 's' : ''}
+                {getTotalVotes()} oy
               </span>
             </div>
 
@@ -281,7 +302,7 @@ export function PollCard({ poll, pollId, room, socket, userId, votes }: PollCard
                       <div className="flex items-center justify-between">
                         <span>{option}</span>
                         <span className="text-xs">
-                          {voteCount} vote{voteCount !== 1 ? 's' : ''}
+                          {voteCount} oy
                         </span>
                       </div>
                     </button>

@@ -45,13 +45,13 @@ export function AddCardButton({ column, socket, room }: AddCardButtonProps) {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Enter your card content..."
+          placeholder="Kart içeriğinizi girin..."
           className="retro-input w-full h-24 resize-none"
           autoFocus
         />
         <div className="flex items-center space-x-2 mt-2">
           <Button type="submit" size="sm" className="retro-button-primary">
-            Add Card
+            Kart Ekle
           </Button>
           <Button 
             type="button" 
@@ -60,7 +60,7 @@ export function AddCardButton({ column, socket, room }: AddCardButtonProps) {
             onClick={handleCancel}
             className="retro-button-secondary"
           >
-            Cancel
+            İptal
           </Button>
         </div>
       </form>
@@ -75,7 +75,7 @@ export function AddCardButton({ column, socket, room }: AddCardButtonProps) {
       className="w-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
     >
       <Plus className="h-4 w-4 mr-2" />
-      Add Card
+      Kart Ekle
     </Button>
   )
 } 

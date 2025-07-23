@@ -35,7 +35,7 @@ export default function JoinPage() {
         <header className="flex justify-between items-center mb-16">
           <Link href="/" className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
             <ArrowLeft className="h-5 w-5" />
-            <span>Back to Home</span>
+            <span>Ana Sayfaya Dön</span>
           </Link>
           <ThemeToggle />
         </header>
@@ -44,24 +44,24 @@ export default function JoinPage() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Join Retrospective
+              Retrospektife Katıl
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Enter the room ID to join an existing retrospective session
+              Mevcut bir retrospektif oturumuna katılmak için oda ID'sini girin
             </p>
           </div>
 
           <form onSubmit={handleJoin} className="space-y-6">
             <div>
               <label htmlFor="roomId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Room ID
+                Oda ID
               </label>
               <input
                 type="text"
                 id="roomId"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
-                placeholder="Enter room ID..."
+                placeholder="Oda ID'sini girin..."
                 className="retro-input"
                 required
               />
@@ -72,13 +72,13 @@ export default function JoinPage() {
               disabled={isJoining || !roomId.trim()}
               className="w-full retro-button-primary"
             >
-              {isJoining ? 'Joining...' : 'Join Room'}
+              {isJoining ? 'Katılıyor...' : 'Odaya Katıl'}
             </Button>
           </form>
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Ask the facilitator for the room ID to join the session.
+              Oturuma katılmak için kolaylaştırıcıdan oda ID'sini isteyin.
             </p>
           </div>
         </div>

@@ -54,7 +54,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
           {/* Left Side - Room Info */}
           <div className="flex items-center space-x-4">
             <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-              Room ID: {room.id}
+              Oda ID: {room.id}
             </div>
             
             {/* Share Button */}
@@ -65,7 +65,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
               className="retro-button-secondary"
             >
               <Share2 className="h-4 w-4 mr-2" />
-              Share
+              Paylaş
             </Button>
             
             {/* Connection Status - Shows if WebSocket is connected to the server */}
@@ -77,7 +77,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
               )}
               <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
                 <span className="bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg whitespace-nowrap">
-                  {isConnected ? 'Connected' : 'Disconnected'}
+                  {isConnected ? 'Bağlı' : 'Bağlantı Yok'}
                 </span>
               </div>
             </div>
@@ -101,7 +101,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
                 className="retro-button-secondary"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Export
+                Dışa Aktar
               </Button>
 
               {/* Settings Button (Facilitator Only) */}
@@ -114,14 +114,14 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
                   className="retro-button-secondary"
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  Ayarlar
                 </Button>
               )}
               */}
 
               {/* Participant Count */}
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                {room.users.length} participant{room.users.length !== 1 ? 's' : ''}
+                {room.users.length} katılımcı
               </div>
 
               {/* Theme Toggle */}
@@ -135,7 +135,7 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
           <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-in slide-in-from-top-2">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-white rounded-full"></div>
-              <span>Join link copied to clipboard!</span>
+              <span>Katılım bağlantısı panoya kopyalandı!</span>
             </div>
           </div>
         )}

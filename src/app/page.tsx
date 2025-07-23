@@ -31,23 +31,23 @@ export default function HomePage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Real-time Retrospectives
+            Gerçek Zamanlı Retrospektif
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Collaborate with your team in real-time. Share thoughts, vote on ideas, and run interactive polls 
-            to make your retrospectives more engaging and productive.
+            Ekibinizle gerçek zamanlı olarak işbirliği yapın. Düşünceleri paylaşın, fikirler üzerinde oy verin ve 
+            retrospektiflerinizi daha etkileşimli ve verimli hale getirmek için anketler çalıştırın.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/create">
               <Button className="retro-button-primary text-lg px-8 py-3">
                 <Plus className="h-5 w-5 mr-2" />
-                Create New Room
+                Yeni Oda Oluştur
               </Button>
             </Link>
             <Link href="/join">
               <Button variant="outline" className="retro-button-secondary text-lg px-8 py-3">
                 <Users className="h-5 w-5 mr-2" />
-                Join Existing Room
+                Mevcut Odaya Katıl
               </Button>
             </Link>
           </div>
@@ -60,10 +60,10 @@ export default function HomePage() {
               <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Real-time Collaboration
+              Gerçek Zamanlı İşbirliği
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              See updates instantly as your team adds cards, votes, and reacts in real-time.
+              Ekibiniz kart ekledikçe, oy verdikçe ya da tepki verdiğinde anlık güncellemeleri görün.
             </p>
           </div>
           <div className="text-center">
@@ -71,10 +71,10 @@ export default function HomePage() {
               <Zap className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Interactive Polls
+              Etkileşimli Anketler
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Run quick polls with voting, scales, and emoji reactions to gather team feedback.
+              Ekip geri bildirimi toplamak için oylama ve emoji tepkileri ile hızlı anketler çalıştırın.
             </p>
           </div>
           <div className="text-center">
@@ -82,10 +82,10 @@ export default function HomePage() {
               <Star className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Anonymous Participation
+              Anonim Katılım
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Encourage honest feedback with anonymous cards and voting options.
+              Anonim kartlar ve oylama seçenekleri ile dürüst geri bildirimi teşvik edin.
             </p>
           </div>
         </div>

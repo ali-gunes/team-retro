@@ -134,7 +134,7 @@ export function RetroCard({ card, room, socket, isLocked, userId }: RetroCardPro
                   className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 className="h-4 w-4" />
-                  <span>Delete Card</span>
+                  <span>Kartı Sil</span>
                 </button>
               </div>
             )}

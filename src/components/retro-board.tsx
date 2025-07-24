@@ -46,7 +46,7 @@ export function RetroBoard({ room, socket, isConnected, userId, columns = ['poll
   }
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden">
       {/* Header */}
       <RoomHeader 
         room={room} 

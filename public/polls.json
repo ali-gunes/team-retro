@@ -1,0 +1,99 @@
+[
+  {
+    "category": "İş Yeri",
+    "polls": [
+      {
+        "question": "Bu sprintte yöneticiniz size destek verdi mi?",
+        "type": "yes_no"
+      },
+      {
+        "question": "Bu sprintteki iş-yaşam dengesini nasıl değerlendiriyorsunuz?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "İşinizi verimli yapabilmek için gerekli araçlar ve kaynaklarınız var mı?",
+        "type": "yes_no"
+      },
+      {
+        "question": "İşyeri faktörlerinden hangisi üretkenliğinize en fazla etki etti?",
+        "type": "multiple_choice",
+        "options": ["Gürültü", "Toplantılar", "Teams/Slack/Chat", "Teknik Sorunlar", "Hiçbiri"]
+      }
+    ]
+  },
+  {
+    "category": "Sprint",
+    "polls": [
+      {
+        "question": "Bu sprint için planlama sürecini nasıl değerlendiriyorsunuz?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "Bu sprint hedefleri gerçekçi miydi?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "Bu sprintte size atanan işleri tamamladınız mı?",
+        "type": "yes_no"
+      },
+      {
+        "question": "Bu sprintte işlerin gecikmesine neden olan nedir?",
+        "type": "multiple_choice",
+        "options": ["Ucu açık gereksinimler", "Kapsam genişlemesi", "Fazla iş planı", "Hatalar", "Diğer"]
+      }
+    ]
+  },
+  {
+    "category": "Ekip",
+    "polls": [
+      {
+        "question": "Ekibe olan katkılarınızın farkedildiğini düşünüyor musunuz?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "Ekip içi iletişim etkili miydi?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "Ekibinizdeki psikolojik güvenlik seviyesini nasıl değerlendiriyorsunuz?",
+        "type": "yes_no"
+      },
+      {
+        "question": "Bu sprintte birbirinize nasıl yardım ettiniz?",
+        "type": "emoji_scale",
+        "options": ["😕", "😐", "🙂", "😃", "🤝"]
+      }
+    ]
+  },
+  {
+    "category": "Üretkenlik",
+    "polls": [
+      {
+        "question": "Bu sprintte ne kadar odaklı kaldınız?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "Bu sprintte sürüklenmeye neden olan bir engel var mıydı?",
+        "type": "yes_no"
+      }
+    ]
+  },
+  {
+    "category": "Genel Durum",
+    "polls": [
+      {
+        "question": "Son sprint hakkında nasıl hissediyorsunuz?",
+        "type": "emoji_scale",
+        "options": ["😠", "😞", "😐", "🙂", "🎉"]
+      },
+      {
+        "question": "Bu sprint başarılı mıydı?",
+        "type": "scale_1_5"
+      },
+      {
+        "question": "Bu sprintte bitirdiğiniz işlerden memnun musunuz?",
+        "type": "yes_no"
+      }
+    ]
+  }
+]

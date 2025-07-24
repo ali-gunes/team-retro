@@ -1,114 +1,62 @@
-# Team Retro - Real-time Retrospective App
+# Team Retro - Real-time Retrospectives
 
-A real-time retrospective application for Scrum teams built with React, TypeScript, TailwindCSS, and PartyKit for WebSocket communication.
+A modern, real-time retrospective tool built with Next.js, TypeScript, and PartyKit for seamless team collaboration.
 
-## 🚀 Features
+## 🌟 Features
 
-### Core Functionality
-- **Real-time Collaboration**: Live updates across all connected users
-- **Four-Column Board**: Start, Stop, Action, and Quick Polls columns
-- **Anonymous Cards**: Post cards anonymously by default
-- **Markdown Support**: Rich text formatting in cards
-- **Voting System**: Upvote cards to prioritize discussion
-- **Emoji Reactions**: React to cards with emojis
-- **Drag & Drop**: Move cards between columns
-- **Card Deletion**: Delete cards (author-only with proper authorization)
+### Real-time Collaboration
+- **Live Updates**: See cards, votes, and reactions in real-time
+- **WebSocket Connection**: Stable connection with heartbeat mechanism
+- **Multi-user Support**: Multiple participants can join simultaneously
+- **Connection Status**: Visual indicator for connection health
 
 ### Interactive Poll System
-- **Categorized Polls**: Workplace, Sprint, Team, Productivity, and General Mood categories
-- **Multiple Poll Types**: Yes/No, Scale (1-5), Emoji Scale, and Multiple Choice polls
-- **Real-time Voting**: Instant feedback with optimistic UI updates
-- **Poll Selection**: Toggle-based poll selection during room creation
-- **Visual Results**: Real-time poll results visible to all participants
-- **Auto-sync**: Server reconciliation with error handling
+- **Predefined Polls**: Choose from curated polls during room creation
+- **Multiple Poll Types**: Yes/No, Scale 1-5, Multiple Choice, Emoji Scale
+- **Real-time Voting**: Vote and change votes dynamically
+- **Poll Categories**: Organized polls by category (Team Health, Process, etc.)
+- **Optimistic Updates**: Instant UI feedback with server reconciliation
 
 ### Room Management
-- **Enhanced Room Creation**: Toggle-based poll selection with categorized tabs
-- **Share Room Links**: Copy room links to clipboard with toast notifications
-- **Automatic Join**: Direct room joining via shared links
-- **Room Name Processing**: Auto-trim and capitalize room names
-- **Responsive Layout**: Centered layout when polls are hidden
+- **Easy Room Creation**: Simple room creation with custom names
+- **Join via Link**: Share room links for instant joining
+- **Room Name Formatting**: Automatic trimming and capitalization
+- **Participant Tracking**: Real-time participant count
 
-### Phase Management
-- **Ideation**: Add cards to columns
-- **Grouping**: Organize similar cards
-- **Voting**: Vote on important items
-- **Discussion**: Discuss top voted items
-- **Timer Support**: Visual countdown for each phase
+### Card Management
+- **Drag & Drop**: Move cards between columns seamlessly
+- **Voting System**: Vote on cards with real-time updates
+- **Reactions**: Add emoji reactions to cards
+- **Card Deletion**: Delete cards (author-only)
+- **Anonymous Cards**: Option for anonymous card creation
 
-### Facilitator Controls
-- **Phase Control**: Start/stop phases and timers
-- **Column Locking**: Prevent further editing on columns
-- **Room Settings**: Configure anonymity, voting, reactions
-- **Export Options**: PDF, Markdown, and JSON exports
-- **Card Highlighting**: Highlight important cards
+### Export Functionality
+- **PDF Export**: Professional PDF reports with three options:
+  - **Actions Only**: Export only action items
+  - **Full Summary**: All cards with votes and poll results
+  - **Poll Results**: Detailed poll data with breakdowns
+- **Turkish Character Support**: Proper encoding for Turkish text
+- **Professional Formatting**: Clean, readable PDFs with metadata
 
-### Technical Features
-- **Dark/Light Theme**: Automatic theme switching
-- **Responsive Design**: Works on desktop and mobile
-- **Real-time Sync**: WebSocket-based state synchronization
-- **Redis Storage**: Temporary room state persistence
-- **Vercel Deployment**: Ready for production deployment
-- **Updates Section**: Auto-carousel showing latest features and improvements
+### User Experience
+- **Turkish Interface**: Fully translated to Turkish
+- **Random Pastel Backgrounds**: Beautiful, changing backgrounds in light mode
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Dark/Light Mode**: Toggle between themes
+- **Accessibility**: Screen reader friendly with proper ARIA labels
 
-## 🛠️ Tech Stack
+### Visual Design
+- **Modern UI**: Clean, intuitive interface
+- **Color-coded Columns**: Different colors for different card types
+- **Emoji Integration**: Visual indicators throughout the app
+- **Smooth Animations**: Polished user interactions
 
-### Frontend
-- **React 18** with TypeScript
-- **Next.js 14** for routing and API routes
-- **TailwindCSS** for styling with dark mode
-- **React Beautiful DnD** for drag and drop
-- **React Markdown** for content rendering
-- **Lucide React** for icons
-
-### Backend
-- **PartyKit** for WebSocket communication
-- **Redis** for in-memory storage
-- **Node.js** for API routes and exports
-
-### Development
-- **TypeScript** for type safety
-- **ESLint** for code quality
-- **Prettier** for code formatting
-
-## 📁 Project Structure
-
-```
-team-retro/
-├── src/
-│   ├── app/                    # Next.js app router
-│   │   ├── globals.css        # Global styles
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Landing page with updates section
-│   │   ├── create/            # Create room page with poll selection
-│   │   ├── join/              # Join room page
-│   │   ├── room/[id]/         # Room page with dynamic columns
-│   │   └── api/               # API routes
-│   ├── components/            # React components
-│   │   ├── ui/               # Reusable UI components
-│   │   ├── retro-board.tsx   # Main board component
-│   │   ├── retro-column.tsx  # Column component with poll support
-│   │   ├── retro-card.tsx    # Card component with delete functionality
-│   │   ├── poll-card.tsx     # Interactive poll component
-│   │   ├── updates-section.tsx # Updates carousel component
-│   │   └── ...
-│   ├── hooks/                # Custom React hooks
-│   ├── lib/                  # Utility functions
-│   └── types/                # TypeScript type definitions
-├── partykit/                 # PartyKit server
-│   ├── room.ts              # WebSocket room handler with poll support
-│   └── partykit.json        # PartyKit configuration
-├── public/                   # Static assets
-│   └── polls.json           # Poll definitions with categories
-└── package.json             # Dependencies and scripts
-```
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
-- Redis instance (for production)
+- Redis (for PartyKit)
 
 ### Installation
 
@@ -128,10 +76,10 @@ team-retro/
    cp .env.example .env.local
    ```
    
-   Add your configuration:
-   ```env
-   NEXT_PUBLIC_PARTYKIT_HOST=localhost:1999
-   REDIS_URL=your-redis-url
+   Add your Redis URL to `.env.local`:
+   ```
+   UPSTASH_REDIS_REST_URL=your_redis_url_here
+   UPSTASH_REDIS_REST_TOKEN=your_redis_token_here
    ```
 
 4. **Start the development server**
@@ -139,143 +87,172 @@ team-retro/
    npm run dev
    ```
 
-5. **Start PartyKit server**
-   ```bash
-   npx partykit dev
-   ```
-
-6. **Open your browser**
+5. **Open your browser**
    Navigate to `http://localhost:3000`
 
-## 🎯 Usage
+## 📖 Usage
 
 ### Creating a Room
-1. Visit the homepage
-2. Click "Create New Room"
-3. Enter room name and your name
-4. **Optional**: Enable Quick Polls and select polls from categories
-5. You'll be redirected to the room as facilitator
+1. Click "Yeni Oda Oluştur" on the main page
+2. Enter a room name
+3. Optionally enable "Hızlı Anketleri Etkinleştir"
+4. Select polls from different categories if enabled
+5. Click "Oda Oluştur"
 
 ### Joining a Room
-1. Visit the homepage
-2. Click "Join Existing Room"
-3. Enter the room ID and your name
-4. Join the active session
+1. Click "Mevcut Odaya Katıl" on the main page
+2. Enter the room ID
+3. Click "Odaya Katıl"
 
 ### Using the Board
-- **Add Cards**: Click "Add Card" in any column (except Quick Polls)
-- **Vote**: Click the heart icon on cards
-- **React**: Click the message icon to add emojis
+- **Add Cards**: Click "Kart Ekle" in any column
+- **Vote**: Click the vote button on cards
 - **Drag & Drop**: Move cards between columns
-- **Delete Cards**: Use the three-dots menu (author-only)
-- **Vote on Polls**: Click poll options to vote (real-time updates)
-- **Phase Control**: Use the phase controls (facilitator only)
+- **Delete**: Use the three-dots menu (author only)
+- **Share**: Click the share button to copy the join link
 
-### Poll System
-- **Enable Polls**: Toggle "Enable Quick Polls" during room creation
-- **Select Polls**: Choose from Workplace, Sprint, Team, Productivity, and General Mood categories
-- **Vote**: Click on poll options to vote (can change votes dynamically)
-- **View Results**: See real-time results and vote counts
-- **Poll Types**: Yes/No, Scale (1-5), Emoji Scale, and Multiple Choice
+### Exporting Data
+1. Click "Dışa Aktar" in the room header
+2. Choose from three export options:
+   - **Aksiyon Maddeleri**: Only action items
+   - **Tam Özet**: All cards and poll results
+   - **Anket Sonuçları**: Detailed poll data
+3. PDF will download automatically
+
+## 🏗️ Project Structure
+
+```
+team-retro/
+├── src/
+│   ├── app/                    # Next.js app router
+│   │   ├── page.tsx           # Main landing page
+│   │   ├── create/page.tsx    # Room creation page
+│   │   ├── join/page.tsx      # Room joining page
+│   │   └── room/[id]/page.tsx # Room board page
+│   ├── components/             # React components
+│   │   ├── retro-board.tsx    # Main board component
+│   │   ├── retro-column.tsx   # Individual column
+│   │   ├── retro-card.tsx     # Card component
+│   │   ├── poll-card.tsx      # Poll component
+│   │   ├── export-dropdown.tsx # Export options
+│   │   ├── room-header.tsx    # Room header
+│   │   ├── updates-section.tsx # Updates carousel
+│   │   └── ui/                # UI components
+│   ├── hooks/                  # Custom hooks
+│   │   └── use-party-socket.ts # WebSocket hook
+│   ├── types/                  # TypeScript types
+│   │   └── index.ts           # Type definitions
+│   └── utils/                  # Utility functions
+│       └── export-utils.ts    # PDF export utilities
+├── partykit/                   # PartyKit server
+│   └── room.ts                # Room logic and WebSocket handling
+├── public/                     # Static assets
+│   ├── polls.json             # Predefined polls
+│   ├── logo_teamretro.svg     # Logo
+│   └── logo_teamretro.png     # Favicon
+└── package.json
+```
 
 ## 🔧 Configuration
 
-### PartyKit Configuration
-The PartyKit server handles real-time communication:
-
+### Poll Configuration
+Polls are defined in `public/polls.json` with the following structure:
 ```json
-{
-  "name": "team-retro-partykit",
-  "main": "room.ts",
-  "parties": {
-    "room": "room.ts"
-  },
-  "env": {
-    "REDIS": {
-      "type": "redis"
-    }
+[
+  {
+    "category": "Team Health",
+    "polls": [
+      {
+        "question": "How is the team morale?",
+        "type": "scale_1_5"
+      }
+    ]
   }
-}
+]
 ```
 
-### Redis Storage
-Room data is stored in Redis with the following keys:
-- `room:<id>:cards` - Card data
-- `room:<id>:votes` - Vote data
-- `room:<id>:users` - User data
-- `room:<id>:settings` - Room settings
-- `room:<id>:polls` - Poll data
-- `room:<id>:pollVotes` - Poll vote data
+### Poll Types
+- **yes_no**: Yes/No questions
+- **scale_1_5**: 1-5 scale questions
+- **multiple_choice**: Multiple choice with options
+- **emoji_scale**: Emoji-based rating
 
-### Poll Configuration
-Polls are defined in `public/polls.json` with categories:
-- **Workplace**: Manager support, work-life balance, tools/resources
-- **Sprint**: Planning process, goals, completion status
-- **Team**: Contributions, communication, psychological safety
-- **Productivity**: Focus, blockers
-- **General Mood**: Sprint feelings, success rating, pride
+## 🗄️ Data Storage
+
+### Redis Storage
+- `room:<id>`: Room data (cards, votes, users, polls)
+- `room:<id>:polls`: Selected polls for the room
+- `room:<id>:pollVotes`: Poll vote data
+
+### Local Storage
+- `room-name-<id>`: Room name
+- `room-polls-<id>`: Selected polls data
+- `user-id`: User identification
+
+## 🔌 API Endpoints
+
+- `GET /api/export`: Export room data (legacy JSON export)
+- WebSocket: Real-time communication via PartyKit
+
+## 🎨 Styling
+
+- **TailwindCSS**: Utility-first CSS framework
+- **Custom Colors**: Retro-themed color palette
+- **Responsive Design**: Mobile-first approach
+- **Dark Mode**: Full dark mode support
 
 ## 🚀 Deployment
 
-### Vercel Deployment
-1. Connect your repository to Vercel
-2. Set environment variables:
-   - `NEXT_PUBLIC_PARTYKIT_HOST`
-   - `REDIS_URL`
-3. Deploy the application
+### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Add environment variables in Vercel dashboard
+3. Deploy automatically on push
 
-### PartyKit Deployment
-1. Deploy PartyKit to your preferred platform
-2. Update the `NEXT_PUBLIC_PARTYKIT_HOST` environment variable
-3. Configure Redis connection
-
-## 🧪 Development
-
-### Available Scripts
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript type checking
+### Environment Variables
+```
+UPSTASH_REDIS_REST_URL=your_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_redis_token
 ```
 
-### Code Quality
-- TypeScript for type safety
-- ESLint for code linting
-- Prettier for code formatting
-- TailwindCSS for consistent styling
+## 🔄 Recent Updates
 
-## 📈 Recent Updates
+### v1.2.0 - Export & Polish (Current)
+- ✨ **PDF Export System**: Professional PDF exports with three options
+- 🌍 **Turkish Translation**: Complete interface translation
+- 🎨 **Random Pastel Backgrounds**: Beautiful changing backgrounds
+- 🔧 **Heartbeat Mechanism**: Stable WebSocket connections
+- 📱 **Responsive Layout**: Full viewport usage with scrollable columns
+- 🗑️ **Card Deletion**: Author-only card deletion
+- 📊 **Enhanced Polls**: Better poll results display
 
-### v1.2.0 - Poll System Launch (2025-07-24)
-- **Interactive Quick Polls**: Real-time voting with categorized poll selection
-- **Multiple Poll Types**: Yes/No, Scale, Emoji Scale, and Multiple Choice
-- **Optimistic Updates**: Instant UI feedback with server reconciliation
-- **Enhanced Room Creation**: Toggle-based poll selection with categorized tabs
+### v1.1.0 - Poll System
+- ✨ **Interactive Polls**: Real-time voting system
+- 📋 **Poll Categories**: Organized poll selection
+- 🎯 **Multiple Poll Types**: Yes/No, Scale, Multiple Choice, Emoji
+- 🔄 **Optimistic Updates**: Instant UI feedback
+- 📊 **Poll Results**: Real-time result display
 
-### Recent Improvements (2025-07-23)
-- **Card Delete Functionality**: Author-only card deletion with proper authorization
-- **Share Room Links**: Copy room links with toast notifications and automatic join
-- **Responsive Layout**: Centered layout when polls are hidden
-- **Room Name Processing**: Auto-trim and capitalize room names
+### v1.0.0 - Core Features
+- 🚀 **Real-time Collaboration**: Live updates and WebSocket
+- 📝 **Card Management**: Add, vote, and organize cards
+- 👥 **Multi-user Support**: Multiple participants
+- 🎨 **Modern UI**: Clean, intuitive interface
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- Built with [Next.js](https://nextjs.org/)
-- Real-time communication with [PartyKit](https://partykit.io/)
-- Styling with [TailwindCSS](https://tailwindcss.com/)
-- Icons from [Lucide](https://lucide.dev/)
-- Turkish footer message: "C&I ekibi için ❤ ve ☕️ ile yapılmıştır." 
+- **C&I ekibi için ❤️ ve ☕️ ile yapılmıştır.**
+- Built with Next.js, TypeScript, and PartyKit
+- Icons by Lucide React
+- Styling with TailwindCSS 

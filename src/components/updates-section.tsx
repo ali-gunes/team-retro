@@ -13,36 +13,43 @@ interface Update {
 }
 
 const updates: Update[] = [
+    {
+        id: '1',
+        type: 'feature',
+        title: 'Dışa Aktar',
+        description: 'PDF formatında dışa aktarma seçeneği eklendi',
+        date: '2025-07-24'
+      },
   {
-    id: '1',
+    id: '2',
     type: 'version',
-    title: 'v1.2.0 - Anket Sistemi Lansmanı',
-    description: 'Gerçek zamanlı oylama ve kategorize edilmiş anket seçimi ile etkileşimli Hızlı Anketler tanıtılıyor',
+    title: 'v0.2.0 - Anket Sistemi Stabil',
+    description: 'Gerçek zamanlı oylama ve kategorize edilmiş anket seçimi ile etkileşimli Hızlı Anketler',
     date: '2025-07-24'
   },
   {
-    id: '2',
+    id: '3',
     type: 'feature',
     title: 'Hızlı Anketler Sistemi',
     description: 'İş Yeri, Sprint, Ekip ve daha fazlası gibi kategorilerle oda oluşturma sırasında etkileşimli anketler ekleyin',
     date: '2025-07-24'
   },
   {
-    id: '3',
+    id: '4',
     type: 'improvement',
     title: 'Kart Silme İşlevi',
     description: 'Kart yazarları için uygun yetkilendirme ve UI geri bildirimi ile silme seçeneği eklendi',
     date: '2025-07-23'
   },
   {
-    id: '4',
+    id: '5',
     type: 'feature',
     title: 'Oda Bağlantılarını Paylaş',
     description: 'Toast bildirimleri ve otomatik katılım işlevi ile oda bağlantılarını panoya kopyalayın',
     date: '2025-07-23'
   },
   {
-    id: '5',
+    id: '6',
     type: 'improvement',
     title: 'Geliştirilmiş Oda Oluşturma',
     description: 'Kategorize edilmiş sekmeler ve geliştirilmiş kullanıcı deneyimi ile geçiş tabanlı anket seçimi',

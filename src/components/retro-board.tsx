@@ -46,7 +46,7 @@ export function RetroBoard({ room, socket, isConnected, userId, columns = ['poll
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
       <RoomHeader 
         room={room} 
@@ -61,9 +61,9 @@ export function RetroBoard({ room, socket, isConnected, userId, columns = ['poll
       /> */}
 
       {/* Main Board */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex-1 container mx-auto px-4 py-8 flex flex-col overflow-hidden">
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className={`grid gap-6 ${
+          <div className={`grid gap-6 flex-1 items-stretch overflow-hidden ${
             columns.length === 3 
               ? 'grid-cols-1 md:grid-cols-3 max-w-4xl mx-auto' 
               : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
@@ -86,7 +86,7 @@ export function RetroBoard({ room, socket, isConnected, userId, columns = ['poll
       </div>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-auto">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 flex-shrink-0">
         <div className="container mx-auto px-4">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             C&I ekibi için ❤️ ve ☕️ ile yapılmıştır.

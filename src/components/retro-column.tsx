@@ -60,10 +60,10 @@ export function RetroColumn({
   const isLocked = room.settings.lockedColumns.includes(column)
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Column Header */}
       <div 
-        className={`${config.color} text-white rounded-t-lg p-4 cursor-pointer transition-all duration-200 ${
+        className={`${config.color} text-white rounded-t-lg p-4 cursor-pointer transition-all duration-200 flex-shrink-0 ${
           isSelected ? 'ring-2 ring-white ring-opacity-50' : ''
         }`}
         onClick={isSelected ? onDeselect : onSelect}
@@ -81,12 +81,26 @@ export function RetroColumn({
           )}
         </div>
         <div className="mt-2 text-sm opacity-75">
-          {cards.length} kart{cards.length !== 1 ? '' : ''}
+          {column === 'poll' 
+            ? `${room.polls?.length || 0} anket${(room.polls?.length || 0) !== 1 ? '' : ''}`
+            : `${cards.length} kart${cards.length !== 1 ? '' : ''}`
+          }
         </div>
       </div>
 
       {/* Column Content */}
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-b-lg border border-gray-200 dark:border-gray-700 p-4 min-h-[400px] max-h-[600px] flex flex-col">
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-b-lg border border-gray-200 dark:border-gray-700 p-4 flex flex-col overflow-hidden">
+        {/* Add Card Button - Always at top */}
+        {!isLocked && column !== 'poll' && (
+          <div className="mb-4 flex-shrink-0">
+            <AddCardButton
+              column={column}
+              socket={socket}
+              room={room}
+            />
+          </div>
+        )}
+
         <Droppable droppableId={column}>
           {(provided, snapshot) => (
             <div
@@ -134,17 +148,6 @@ export function RetroColumn({
                 </Draggable>
               ))}
               {provided.placeholder}
-
-              {/* Add Card Button */}
-              {!isLocked && column !== 'poll' && (
-                <div className="mt-3">
-                  <AddCardButton
-                    column={column}
-                    socket={socket}
-                    room={room}
-                  />
-                </div>
-              )}
             </div>
           )}
         </Droppable>

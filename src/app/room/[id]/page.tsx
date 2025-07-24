@@ -306,7 +306,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       <RetroBoard 
         room={room} 
         socket={socket}

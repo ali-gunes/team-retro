@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from 'react'
-import { Share2, Download, Settings, Wifi, WifiOff } from 'lucide-react'
+import { Share2, Settings, Wifi, WifiOff } from 'lucide-react'
 import { Button } from './ui/button'
 import { ThemeToggle } from './theme-toggle'
+import { ExportDropdown } from './export-dropdown'
 import type { RetroRoom } from '@/types'
 import Image from 'next/image'
 
@@ -38,11 +39,6 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
       setShowCopiedToast(true)
       setTimeout(() => setShowCopiedToast(false), 2000)
     }
-  }
-
-  const handleExport = () => {
-    // This would trigger an API call to export the room data
-    window.open(`/api/export?roomId=${room.id}&format=json`, '_blank')
   }
 
   const isFacilitator = room.users.some(user => user.isFacilitator)
@@ -93,16 +89,8 @@ export function RoomHeader({ room, isConnected, socket }: RoomHeaderProps) {
           {/* Right Side - Actions */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              {/* Export Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                className="retro-button-secondary"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Dışa Aktar
-              </Button>
+              {/* Export Dropdown */}
+              <ExportDropdown room={room} />
 
               {/* Settings Button (Facilitator Only) */}
               {/* TODO: Settings functionality will be implemented later

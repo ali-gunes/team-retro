@@ -13,13 +13,9 @@ export default function RoomPage() {
   const [isConnected, setIsConnected] = useState(false)
   const processedMessages = useRef(new Set<string>())
 
-  // Function to process room name: trim whitespace and capitalize initials
+  // Function to process room name: trim whitespace
   const processRoomName = (name: string): string => {
-    return name
-      .trim()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
+    return name.trim()
   }
 
   // Get room name from localStorage and process it

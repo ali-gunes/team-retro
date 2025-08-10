@@ -33,7 +33,7 @@
         "type": "scale_1_5"
       },
       {
-        "question": "Bu sprintte size atanan işleri tamamladınız mı?",
+        "question": "Bu sprintte size atanan tüm işleri tamamladınız mı?",
         "type": "yes_no"
       },
       {
@@ -55,11 +55,11 @@
         "type": "scale_1_5"
       },
       {
-        "question": "Ekibinizdeki psikolojik güvenlik seviyesini nasıl değerlendiriyorsunuz?",
-        "type": "yes_no"
+        "question": "Ekibinizdeki psikolojik destek ve ekip içi dayanışma seviyesini nasıl değerlendiriyorsunuz?",
+        "type": "scale_1_5"
       },
       {
-        "question": "Bu sprintte birbirinize nasıl yardım ettiniz?",
+        "question": "Bu sprintte birbirinize ettiğiniz yardımı nasıl değerlendirirsiniz?",
         "type": "emoji_scale",
         "options": ["😕", "😐", "🙂", "😃", "🤝"]
       }
@@ -73,7 +73,7 @@
         "type": "scale_1_5"
       },
       {
-        "question": "Bu sprintte sürüklenmeye neden olan bir engel var mıydı?",
+        "question": "Bu sprintte işlerin uzamasına/sürüklenmesine neden olan bir engel var mıydı?",
         "type": "yes_no"
       }
     ]
@@ -87,7 +87,7 @@
         "options": ["😠", "😞", "😐", "🙂", "🎉"]
       },
       {
-        "question": "Bu sprint başarılı mıydı?",
+        "question": "Bu sprint sence başarılı mıydı?",
         "type": "scale_1_5"
       },
       {
